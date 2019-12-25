@@ -1,6 +1,6 @@
-#### Toy language
+### Toy language
 
-### The whole code is pretty much based on this book https://craftinginterpreters.com/
+#### The whole code is pretty much based on this book https://craftinginterpreters.com/
 
 ```js
 function sayHello(name){
@@ -11,7 +11,7 @@ let name = "world";
 sayHello(name);
 ```
 
-### Usage
+#### Usage
 
 ```sh
 clone this repo
@@ -19,7 +19,7 @@ run `yarn`
 yarn `yarn start`
 ```
 
-### Syntax
+#### Syntax
 
 > Output
 
