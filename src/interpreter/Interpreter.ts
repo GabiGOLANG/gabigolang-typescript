@@ -19,7 +19,7 @@ import {
 } from "../lib/Std";
 import StatementVisitor from "../interfaces/StatementVisitor";
 import Environment from "./environment/Environment";
-import ObjectIsNotCallableException from "./exceptions/NotCallableObject";
+import ObjectIsNotCallableException from "./exceptions/ObjectIsNotCallable";
 import InvalidNumberOfArguments from "./exceptions/InvalidNumberOfArguments";
 import { Statement } from "../parser/statements";
 import BuiltinFunction from "./callable/BuiltinFunction";
@@ -182,7 +182,7 @@ export default class Interpreter
 
   public interpret(statements: Stmt.Statement[]) {
     console.log("statements", statements);
-    
+
     try {
       statements.forEach(statement => statement.accept(this));
     } catch (exception) {
