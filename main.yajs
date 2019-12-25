@@ -1,0 +1,6 @@
+function sayHello(name){
+  print "Hello " + name;
+}
+
+let name = "world";
+sayHello(name);

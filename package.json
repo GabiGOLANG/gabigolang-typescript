@@ -1,0 +1,14 @@
+{
+  "name": "interpreter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node_modules/.bin/ts-node src/main"
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.20",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.3"
+  }
+}
