@@ -109,7 +109,7 @@ export default class Parser {
   private finishCall(callee: Expr.Expression): Expr.Expression {
     const args: Expr.Expression[] = [];
 
-    if (!this.check(TokenType.RIGHT_PAREN)) {
+    if (not(this.check(TokenType.RIGHT_PAREN))) {
       while (true) {
         args.push(this.expression());
 

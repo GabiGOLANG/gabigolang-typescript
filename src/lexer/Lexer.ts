@@ -59,8 +59,11 @@ export default class Lexer {
     this.endOfSource() ? "\0" : this.source[this.current + offset];
 
   private match(expected: string): boolean {
-    if (or(this.endOfSource(), not(equal(this.source[this.current], expected))))
+    if (
+      or(this.endOfSource(), not(equal(this.source[this.current], expected)))
+    ) {
       return false;
+    }
 
     ++this.current;
     return true;
