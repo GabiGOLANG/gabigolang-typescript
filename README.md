@@ -60,7 +60,10 @@ let aBiggerThanB = a > b;
 let aEqualsB = a == b;
 let aDifferentThanB = a != b;
 
-let false = !true;
+let f = !true;
+
+let f1 = true and false;
+let t = true or false;
 ```
 
 > Scope
@@ -82,6 +85,18 @@ print i; // 10;
 ```js
 if(true) {
   ...
+}
+
+if(true and false) {
+  ...
+} else {
+
+}
+
+if(true or false) {
+  ...
+} else {
+
 }
 
 if(!false) {
