@@ -23,11 +23,16 @@ import ObjectIsNotCallableException from "./exceptions/ObjectIsNotCallable";
 import InvalidNumberOfArguments from "./exceptions/InvalidNumberOfArguments";
 import { Statement } from "../parser/statements";
 import BuiltinFunction from "./callable/BuiltinFunction";
+import ReturnException from "./exceptions/Return";
 
 export default class Interpreter
   implements ExpressionVisitor<any>, StatementVisitor<void> {
-  private environment: Environment = new Environment();
   public globals: Environment = new Environment();
+  private environment: Environment = new Environment().setParentEnvironment(
+    this.globals
+  );
+
+  public getEnvironment = (): Environment => this.environment;
 
   public visitBinaryExpression(expression: Expr.Binary): any {
     const left = expression.left.accept(this);
@@ -117,9 +122,9 @@ export default class Interpreter
     const args: any = [];
     expression.args.forEach(arg => args.push(arg.accept(this)));
 
-    if (not(equal(args.length, callee.arity()))) {
+    if (not(equal(args.length, callee.__arity()))) {
       throw new InvalidNumberOfArguments(
-        `function ${callee.name()} expects ${callee.arity()}, got ${
+        `function ${callee.__name()} expects ${callee.arity()}, got ${
           args.length
         }`
       );
@@ -143,10 +148,10 @@ export default class Interpreter
   }
 
   public visitBlockStatement(statement: Stmt.Block) {
-    this.executeBlock(
-      statement.statements,
-      new Environment().setParentEnvironment(this.environment)
-    );
+    const environment = new Environment();
+    environment.setParentEnvironment(this.environment);
+
+    this.executeBlock(statement.statements, environment);
   }
 
   public executeBlock(block: Statement[], environment: Environment) {
@@ -180,9 +185,12 @@ export default class Interpreter
     this.environment.define(statement.name.lexeme as string, fn);
   }
 
-  public interpret(statements: Stmt.Statement[]) {
-    console.log("statements", statements);
+  public visitReturnStatement(statement: Stmt.Return) {
+    const value = statement.value ? statement.value.accept(this) : null;
+    throw new ReturnException(value);
+  }
 
+  public interpret(statements: Stmt.Statement[]) {
     try {
       statements.forEach(statement => statement.accept(this));
     } catch (exception) {

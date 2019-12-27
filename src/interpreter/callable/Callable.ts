@@ -1,7 +1,8 @@
 import Interpreter from "../Interpreter";
+import { Maybe } from "../../lib/Std";
 
 export default interface Callable {
-  arity(): number;
-  name(): string;
-  __call(interpreter: Interpreter, args: any[]);
+  __arity(): number;
+  __name(): string;
+  __call<T>(interpreter: Interpreter, args: any[]): Maybe<T>;
 }

@@ -2,23 +2,30 @@ import Callable from "./Callable";
 import * as Stmt from "../../parser/statements";
 import Environment from "../environment/Environment";
 import Interpreter from "../Interpreter";
+import { Maybe } from "../../lib/Std";
 
 export default class BuiltinFunction implements Callable {
   constructor(public declaration: Stmt.Function) {}
 
-  public arity = () => this.declaration.params.length;
+  public __arity = (): number => this.declaration.params.length;
 
-  public name = () => this.declaration.name.lexeme as string;
+  public __name = (): string => this.declaration.name.lexeme as string;
 
-  public __call(interpreter: Interpreter, args: any[]) {
+  public __call<T>(interpreter: Interpreter, args: any[]): Maybe<T> {
     const environment = new Environment().setParentEnvironment(
-      interpreter.globals
+      interpreter.getEnvironment()
     );
 
     for (let i = 0; i < this.declaration.params.length; ++i) {
       environment.define(this.declaration.params[i].lexeme as string, args[i]);
     }
 
-    interpreter.executeBlock(this.declaration.body, environment);
+    try {
+      interpreter.executeBlock(this.declaration.body, environment);
+    } catch (returnException) {
+      return returnException.value;
+    }
+
+    return null;
   }
 }

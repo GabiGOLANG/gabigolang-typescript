@@ -306,9 +306,23 @@ export default class Parser {
     return body;
   }
 
+  private returnStatement(): Stmt.Statement {
+    const keyword = this.previous();
+
+    const value = not(this.check(TokenType.SEMICOLON))
+      ? this.expression()
+      : null;
+
+    this.consume(TokenType.SEMICOLON, "Expect ';' after return statement");
+    return new Stmt.Return(keyword, value);
+  }
+
   private statement(): Stmt.Statement {
     if (this.match(TokenType.PRINT)) {
       return this.printStatement();
+    }
+    if (this.match(TokenType.RETURN)) {
+      return this.returnStatement();
     }
     if (this.match(TokenType.WHILE)) {
       return this.whileStatement();

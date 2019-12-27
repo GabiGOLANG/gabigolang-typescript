@@ -8,4 +8,5 @@ export default interface StatementVisitor<T> {
   visitIfStatement(statement: Stmt.If): T;
   visitWhileStatement(statement: Stmt.While): T;
   visitFunctionStatement(statement: Stmt.Function): T;
+  visitReturnStatement(statement: Stmt.Return): T;
 }
