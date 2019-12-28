@@ -5,6 +5,7 @@ export default interface StatementVisitor<T> {
   visitExpressionStatement(statement: Stmt.Expression): T;
   visitPrintStatement(statement: Stmt.Print): T;
   visitLetStatement(statement: Stmt.Let): T;
+  visitConstStatement(statement: Stmt.Const): T;
   visitIfStatement(statement: Stmt.If): T;
   visitWhileStatement(statement: Stmt.While): T;
   visitFunctionStatement(statement: Stmt.Function): T;

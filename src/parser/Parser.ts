@@ -11,11 +11,11 @@ export default class Parser {
 
   private previous = (): Token => this.tokens[this.current - 1];
 
-  private peek = (): Token => this.tokens[this.current];
+  private peek = (offset: number = 0): Token =>
+    this.tokens[this.current + offset];
 
   private endOfSource = () => equal(this.peek().type, TokenType.END_OF_FILE);
 
-  // @ts-ignore
   private synchronize(): void {
     this.advance();
 
@@ -85,13 +85,12 @@ export default class Parser {
     if (this.match(TokenType.TRUE)) {
       return new Expr.Literal(true);
     }
-    if (this.match(TokenType.NIL)) {
+    if (this.match(TokenType.NULL)) {
       return new Expr.Literal(null);
     }
     if (this.match(TokenType.NUMBER, TokenType.STRING)) {
       return new Expr.Literal(this.previous().literal);
     }
-
     if (this.match(TokenType.IDENTIFIER)) {
       return new Expr.Variable(this.previous());
     }
@@ -154,8 +153,20 @@ export default class Parser {
     return this.call();
   }
 
-  private multiplication(): Expr.Expression {
+  private nullCoalescing(): Expr.Expression {
     let expr = this.unary();
+
+    while (this.match(TokenType.NULL_COALESCING)) {
+      const operator = this.previous();
+      const right = this.expression();
+      expr = new Expr.Binary(expr, operator, new Expr.Literal(right));
+    }
+
+    return expr;
+  }
+
+  private multiplication(): Expr.Expression {
+    let expr = this.nullCoalescing();
 
     while (this.match(TokenType.SLASH, TokenType.STAR)) {
       const operator = this.previous();
@@ -382,14 +393,6 @@ export default class Parser {
 
   private expression = (): Expr.Expression => this.assignment();
 
-  private letDeclaration(): Stmt.Statement {
-    const name = this.consume(TokenType.IDENTIFIER, "Expect variable name");
-    const initializer = this.match(TokenType.EQUAL) ? this.expression() : null;
-
-    this.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration");
-    return new Stmt.Let(name, initializer);
-  }
-
   private function(kind: string): Stmt.Function {
     const name = this.consume(TokenType.IDENTIFIER, `Expect ${kind} name`);
     this.consume(TokenType.LEFT_PAREN, `Expect '(' after ${kind} name`);
@@ -422,6 +425,25 @@ export default class Parser {
     return new Stmt.Function(name, parameters, body);
   }
 
+  private letDeclaration(): Stmt.Statement {
+    const name = this.consume(TokenType.IDENTIFIER, "Expect variable name");
+    const initializer = this.match(TokenType.EQUAL) ? this.expression() : null;
+
+    this.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration");
+    return new Stmt.Let(name, initializer);
+  }
+
+  private constDeclaration(): Stmt.Statement {
+    const name = this.consume(TokenType.IDENTIFIER, "Expect variable name");
+    this.consume(
+      TokenType.EQUAL,
+      `Expect initializer for const variable '${name.lexeme}'`
+    );
+    const initializer = this.expression();
+    this.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration");
+    return new Stmt.Const(name, initializer);
+  }
+
   private declaration(): Maybe<Stmt.Statement> {
     try {
       if (this.match(TokenType.FUNCTION)) {
@@ -429,6 +451,9 @@ export default class Parser {
       }
       if (this.match(TokenType.LET)) {
         return this.letDeclaration();
+      }
+      if (this.match(TokenType.CONST)) {
+        return this.constDeclaration();
       }
 
       return this.statement();

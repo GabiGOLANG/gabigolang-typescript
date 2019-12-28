@@ -41,17 +41,62 @@ print "hello world!";
 > Comments
 
 ```js
-// This is a comment
+// This is a single line comment
+
+/* 
+  this 
+  is
+  a
+  block
+  comment
+*/
 ```
 
 > Variables
 
 ```js
 let a;
+...
+a = "some value";
+
 let b = 10;
 let c = "value";
 let d = 20;
 let e = b + d;
+
+const PI = 3.14159265359;
+
+const cantChangeThisValue = "hello world!";
+cantChangeThisValue = "hello world!!!!!"; // error
+
+const myVariable; // error, const variable must be initialized
+```
+
+> Null and Null coalescing
+
+```js
+const a = null ?? "hello world"; // hello world
+//
+//
+function getValue() {
+  return "value";
+}
+
+const a = null ?? getValue(); // value
+//
+//
+function getValue() {
+  return 10;
+}
+
+const b = getValue() ?? "other value"; // 10;
+//
+//
+function getValue() {
+  return null;
+}
+
+const c = getValue() ?? "other value"; // other value
 ```
 
 > Operators

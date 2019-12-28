@@ -11,13 +11,14 @@ const keywords = new Map<string, TokenType>([
   ["for", TokenType.FOR],
   ["function", TokenType.FUNCTION],
   ["if", TokenType.IF],
-  ["nil", TokenType.NIL],
+  ["null", TokenType.NULL],
   ["print", TokenType.PRINT],
   ["return", TokenType.RETURN],
   ["super", TokenType.SUPER],
   ["this", TokenType.THIS],
   ["true", TokenType.TRUE],
   ["let", TokenType.LET],
+  ["const", TokenType.CONST],
   ["while", TokenType.WHILE]
 ]);
 
@@ -143,11 +144,31 @@ export default class Lexer {
           this.match("=") ? TokenType.GREATER_EQUAL : TokenType.GREATER
         );
         break;
+      case "?":
+        if (this.match("?")) {
+          this.addToken(TokenType.NULL_COALESCING);
+        } else {
+          console.log(`Unexpected character ${character} on line ${this.line}`);
+        }
+
+        break;
       case "/":
         if (this.match("/")) {
-          while (and(not(equal(this.peek(), "\0")), not(this.endOfSource()))) {
+          while (and(not(equal(this.peek(), "\n")), not(this.endOfSource()))) {
             this.nextToken();
           }
+        } else if (this.match("*")) {
+          while (
+            and(
+              not(and(equal(this.peek(), "*"), equal(this.peek(1), "/"))),
+              not(this.endOfSource())
+            )
+          ) {
+            this.nextToken();
+          }
+
+          this.nextToken(); // consume *
+          this.nextToken(); // consume /
         } else {
           this.addToken(TokenType.SLASH);
         }

@@ -12,6 +12,7 @@ export enum TokenType {
   SEMICOLON,
   SLASH,
   STAR,
+  NULL_COALESCING,
 
   // One or two character tokens.
   BANG,
@@ -36,7 +37,7 @@ export enum TokenType {
   FUNCTION,
   FOR,
   IF,
-  NIL,
+  NULL,
   OR,
   PRINT,
   RETURN,
@@ -44,6 +45,7 @@ export enum TokenType {
   THIS,
   TRUE,
   LET,
+  CONST,
   WHILE,
   END_OF_FILE
 }

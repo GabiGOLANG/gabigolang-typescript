@@ -7,3 +7,4 @@ export * from "./If";
 export * from "./While";
 export * from "./Function";
 export * from "./Return";
+export * from "./Const";

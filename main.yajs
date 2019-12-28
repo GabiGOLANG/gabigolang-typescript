@@ -1,3 +1,9 @@
+// comment
+/* 
+ block
+ comment
+*/
+
 function fibonacci(n) {
   if(n < 2) {
     return n;
@@ -14,3 +20,13 @@ function factorial(n) {
 
 print fibonacci(5);
 print factorial(5);
+
+const a = 30;
+print a;
+
+print null ?? "hello world!";
+
+
+
+   
+

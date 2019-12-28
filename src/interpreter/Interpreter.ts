@@ -24,6 +24,7 @@ import InvalidNumberOfArguments from "./exceptions/InvalidNumberOfArguments";
 import { Statement } from "../parser/statements";
 import BuiltinFunction from "./callable/BuiltinFunction";
 import ReturnException from "./exceptions/Return";
+import { Expression } from "../parser/expressions";
 
 export default class Interpreter
   implements ExpressionVisitor<any>, StatementVisitor<void> {
@@ -61,9 +62,20 @@ export default class Interpreter
         return equal(left, right);
       case TokenType.MOD:
         return mod(left, right);
+      case TokenType.NULL_COALESCING:
+        return this.visitNullCoalescingExpression(left, right);
       default:
         return null;
     }
+  }
+
+  private visitNullCoalescingExpression(left: Expression, right: Expression) {
+    if (not(equal(left, null))) {
+      const result = left.accept(this);
+      return not(equal(result, null)) ? result : right.accept(this);
+    }
+
+    return right.accept(this);
   }
 
   public visitUnaryExpression(expression: Expr.Unary): any {
@@ -145,6 +157,11 @@ export default class Interpreter
       : null;
 
     this.environment.define(statement.name.lexeme as string, value);
+  }
+
+  public visitConstStatement(statement: Stmt.Const) {
+    const value = statement.initializer.accept(this);
+    this.environment.define(statement.name.lexeme as string, value, true);
   }
 
   public visitBlockStatement(statement: Stmt.Block) {
