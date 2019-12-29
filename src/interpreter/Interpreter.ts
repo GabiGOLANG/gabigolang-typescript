@@ -74,7 +74,6 @@ export default class Interpreter
       const result = left.accept(this);
       return not(equal(result, null)) ? result : right.accept(this);
     }
-
     return right.accept(this);
   }
 
