@@ -4,8 +4,14 @@ import * as Expr from "./expressions";
 import * as Stmt from "./statements";
 import ParserException from "./exceptions/ParserException";
 
+interface ParserResult {
+  readonly ok: boolean;
+  readonly statements: Stmt.Statement[];
+}
+
 export default class Parser {
   private current: number = 0;
+  private hasError: boolean = false;
 
   constructor(private tokens: Token[]) {}
 
@@ -67,6 +73,8 @@ export default class Parser {
     } else {
       console.error(token.line, ` at "${token.lexeme}"`, message);
     }
+
+    this.hasError = true;
   }
 
   private consume(type: TokenType, message: string): Token {
@@ -144,7 +152,7 @@ export default class Parser {
   }
 
   private unary(): Expr.Expression {
-    if (this.match(TokenType.BANG, TokenType.MINUS)) {
+    if (this.match(TokenType.BANG, TokenType.DOUBLE_BANG, TokenType.MINUS)) {
       const operator = this.previous();
       const right = this.unary();
       return new Expr.Unary(operator, right);
@@ -463,13 +471,13 @@ export default class Parser {
     }
   }
 
-  public parse() {
+  public parse(): ParserResult {
     const statements: any = [];
 
     while (not(this.endOfSource())) {
       statements.push(this.declaration());
     }
 
-    return statements;
+    return { ok: not(this.hasError), statements };
   }
 }

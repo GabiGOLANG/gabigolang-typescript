@@ -83,6 +83,8 @@ export default class Interpreter
     switch (expression.operation.type) {
       case TokenType.BANG:
         return not(isTruthy(right));
+      case TokenType.DOUBLE_BANG:
+        return isTruthy(right);
       case TokenType.MINUS:
         return negate(right);
       default:

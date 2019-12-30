@@ -16,6 +16,7 @@ export enum TokenType {
 
   // One or two character tokens.
   BANG,
+  DOUBLE_BANG,
   BANG_EQUAL,
   EQUAL,
   EQUAL_EQUAL,

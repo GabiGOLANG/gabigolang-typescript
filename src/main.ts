@@ -11,8 +11,10 @@ function main(): void {
   const parser = new Parser(lexer.lex());
   const interpreter = new Interpreter();
 
-  const statements = parser.parse();
+  const { ok, statements } = parser.parse();
 
-  interpreter.interpret(statements);
+  if (ok) {
+    interpreter.interpret(statements);
+  }
 }
 main();

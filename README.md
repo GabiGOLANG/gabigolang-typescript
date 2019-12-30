@@ -52,6 +52,16 @@ print "hello world!";
 */
 ```
 
+> Values
+
+```js
+"hello world"; // string
+1; // number
+null; // null
+true; // boolean
+false; // boolean
+```
+
 > Variables
 
 ```js
@@ -102,34 +112,40 @@ const c = getValue() ?? "other value"; // other value
 > Operators
 
 ```js
-let a = 10;
-let b = 20;
+const a = 10;
+const b = 20;
 
-let c = a + b;
-let d = a * b;
-let e = a / b;
-let f = a mod b;
+const c = a + b;
+const d = a * b;
+const e = a / b;
+const f = a mod b;
 
-let aLessThanB = a < b;
-let aBiggerThanB = a > b;
+const aLessThanB = a < b;
+const aBiggerThanB = a > b;
 
-let aEqualsB = a == b;
-let aDifferentThanB = a != b;
+const aEqualsB = a == b;
+const aDifferentThanB = a != b;
 
-let f = !true;
+const f = !true;
 
-let f1 = true and false;
-let t = true or false;
+const f1 = true and false;
+const t = true or false;
+
+print !!10;             // true
+print !!0;              // false
+print !!"hello world!"; // true
+print !!"";             // false
+print !!null;           // false
 ```
 
 > Scope
 
 ```js
-let i = 10;
+const i = 10;
 print i; // 10;
 
 {
-  let i = 20;
+  const i = 20;
   print i; // 20;
 }
 

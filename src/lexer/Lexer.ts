@@ -129,7 +129,13 @@ export default class Lexer {
 
     switch (character) {
       case "!":
-        this.addToken(this.match("=") ? TokenType.BANG_EQUAL : TokenType.BANG);
+        if (this.match("!")) {
+          this.addToken(TokenType.DOUBLE_BANG);
+        } else if (this.match("=")) {
+          this.addToken(TokenType.BANG_EQUAL);
+        } else {
+          this.addToken(TokenType.BANG);
+        }
         break;
       case "=":
         this.addToken(

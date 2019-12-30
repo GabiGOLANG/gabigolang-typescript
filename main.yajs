@@ -26,7 +26,10 @@ print a;
 
 print null ?? "hello world!";
 
-
-
+print !!10;             // true
+print !!0;              // false
+print !!"hello world!"; // true
+print !!"";             // false
+print !!null;           // false
    
 
