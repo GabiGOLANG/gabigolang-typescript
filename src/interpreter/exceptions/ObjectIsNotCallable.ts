@@ -1,5 +1,5 @@
 export default class ObjectIsNotCallableException extends Error {
-  constructor(message: string) {
-    super(message);
+  constructor(object: any) {
+    super(`object <${object.toString()}> is not callable`);
   }
 }

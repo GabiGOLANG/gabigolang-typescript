@@ -1,5 +1,5 @@
 export default class UndefinedVariableException extends Error {
-  constructor(message: string) {
-    super(message);
+  constructor(variableName: string) {
+    super(`Undefined variable <${variableName}>`);
   }
 }

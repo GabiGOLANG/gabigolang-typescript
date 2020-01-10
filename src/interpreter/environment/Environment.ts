@@ -17,7 +17,7 @@ export default class Environment {
   public define(name: string, value: any, __const: boolean = false): this {
     if (or(this.values.has(name), this.constValues.has(name))) {
       throw new IdentifierAlreadyDeclared(name);
-    } 
+    }
 
     if (__const) {
       this.constValues.set(name, value);
@@ -49,20 +49,42 @@ export default class Environment {
   }
 
   public get(name: Token): any {
-    if (this.values.has(name.lexeme as string)) {
-      return this.values.get(name.lexeme as string);
+    const variableName = name.lexeme as string;
+
+    if (this.values.has(variableName)) {
+      return this.values.get(variableName);
     }
 
-    if (this.constValues.has(name.lexeme as string)) {
-      return this.constValues.get(name.lexeme as string);
+    if (this.constValues.has(variableName)) {
+      return this.constValues.get(variableName);
     }
 
     if (this.parentEnvironment) {
       return this.parentEnvironment.get(name);
     }
 
-    throw new UndefinedVariableException(
-      `Undefined variable "${name.lexeme}""`
-    );
+    throw new UndefinedVariableException(variableName);
+  }
+
+  private getEnvironmentAt(scopeDistance: number): Environment {
+    let currentEnvironment: Environment = this;
+
+    for (let i = 0; i < scopeDistance; ++i) {
+      currentEnvironment = currentEnvironment.parentEnvironment;
+    }
+
+    return currentEnvironment;
+  }
+
+  public getAtScope = (scopeDistance: number, token: Token) =>
+    this.getEnvironmentAt(scopeDistance).get(token);
+
+  public assignAtScope(
+    scopeDistance: number,
+    token: Token,
+    value: any
+  ): Environment {
+    this.getEnvironmentAt(scopeDistance).assign(token, value);
+    return this;
   }
 }

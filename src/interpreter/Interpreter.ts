@@ -20,7 +20,7 @@ import {
 import StatementVisitor from "../interfaces/StatementVisitor";
 import Environment from "./environment/Environment";
 import ObjectIsNotCallableException from "./exceptions/ObjectIsNotCallable";
-import InvalidNumberOfArguments from "./exceptions/InvalidNumberOfArguments";
+import InvalidNumberOfArgumentsException from "./exceptions/InvalidNumberOfArguments";
 import { Statement } from "../parser/statements";
 import BuiltinFunction from "./callable/BuiltinFunction";
 import ReturnException from "./exceptions/Return";
@@ -29,6 +29,7 @@ import { Expression } from "../parser/expressions";
 export default class Interpreter
   implements ExpressionVisitor<any>, StatementVisitor<void> {
   public globals: Environment = new Environment();
+  private locals: Map<Expression, number> = new Map<Expression, number>();
   private environment: Environment = new Environment().setParentEnvironment(
     this.globals
   );
@@ -77,6 +78,14 @@ export default class Interpreter
     return right.accept(this);
   }
 
+  private lookUpVariable(expression: Expr.Variable) {
+    const scopeDistance = this.locals.get(expression);
+
+    return scopeDistance
+      ? this.environment.getAtScope(scopeDistance, expression.name)
+      : this.environment.get(expression.name);
+  }
+
   public visitUnaryExpression(expression: Expr.Unary): any {
     const right = expression.right.accept(this);
 
@@ -99,11 +108,18 @@ export default class Interpreter
     expression.value;
 
   public visitVariableExpression = (expression: Expr.Variable) =>
-    this.environment.get(expression.name);
+    this.lookUpVariable(expression);
 
   public visitAssignExpression(expression: Expr.Assign) {
+    const scopeDistance = this.locals.get(expression);
+
     const value = expression.value.accept(this);
-    this.environment.assign(expression.name, value);
+
+    if (scopeDistance) {
+      this.environment.assignAtScope(scopeDistance, expression.name, value);
+    } else {
+      this.globals.assign(expression.name, value);
+    }
     return value;
   }
 
@@ -127,19 +143,17 @@ export default class Interpreter
     const callee = expression.callee.accept(this);
 
     if (not("__call" in callee)) {
-      throw new ObjectIsNotCallableException(
-        `Object ${JSON.stringify(callee, null, 2)} can't be called`
-      );
+      throw new ObjectIsNotCallableException(callee);
     }
 
     const args: any = [];
     expression.args.forEach(arg => args.push(arg.accept(this)));
 
     if (not(equal(args.length, callee.__arity()))) {
-      throw new InvalidNumberOfArguments(
-        `function ${callee.__name()} expects ${callee.arity()}, got ${
-          args.length
-        }`
+      throw new InvalidNumberOfArgumentsException(
+        callee.__name(),
+        callee.__arity(),
+        args.length
       );
     }
 
@@ -199,13 +213,18 @@ export default class Interpreter
   }
 
   public visitFunctionStatement(statement: Stmt.Function) {
-    const fn = new BuiltinFunction(statement);
+    const fn = new BuiltinFunction(statement, this.environment);
     this.environment.define(statement.name.lexeme as string, fn);
   }
 
   public visitReturnStatement(statement: Stmt.Return) {
     const value = statement.value ? statement.value.accept(this) : null;
     throw new ReturnException(value);
+  }
+
+  public resolve(expression: Expression, depth: number): Interpreter {
+    this.locals.set(expression, depth);
+    return this;
   }
 
   public interpret(statements: Stmt.Statement[]) {

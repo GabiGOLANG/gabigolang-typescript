@@ -164,13 +164,23 @@ export default class Lexer {
             this.nextToken();
           }
         } else if (this.match("*")) {
+          const blockCommentStart = this.line;
+
           while (
             and(
               not(and(equal(this.peek(), "*"), equal(this.peek(1), "/"))),
               not(this.endOfSource())
             )
           ) {
-            this.nextToken();
+            if (this.nextToken() === "\n") {
+              ++this.line;
+            }
+          }
+
+          if (this.endOfSource()) {
+            console.log(
+              `unclosed block comment starting at line ${blockCommentStart}`
+            );
           }
 
           this.nextToken(); // consume *

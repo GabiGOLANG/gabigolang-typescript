@@ -245,3 +245,22 @@ function factorial(n) {
 print fibonacci(5);
 print factorial(5);
 ```
+
+> Closures
+
+```js
+function makeCounter() {
+  let i = 0;
+
+  function count() {
+    i = i + 1;
+    return i;
+  }
+
+  return count;
+}
+
+const count = makeCounter();
+print count();
+print count();
+```

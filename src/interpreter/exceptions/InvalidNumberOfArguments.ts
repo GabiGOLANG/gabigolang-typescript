@@ -1,5 +1,5 @@
-export default class InvalidNumberOfArguments extends Error {
-  constructor(message: string) {
-    super(message);
+export default class InvalidNumberOfArgumentsException extends Error {
+  constructor(functionName: string, expected: number, got: number) {
+    super(`<${functionName}> expected ${arguments} arguments , got ${got}`);
   }
 }

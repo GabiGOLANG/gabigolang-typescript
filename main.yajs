@@ -4,32 +4,18 @@
  comment
 */
 
-function fibonacci(n) {
-  if(n < 2) {
-    return n;
+function makeCounter() {
+  let i = 0;
+
+  function count() {
+    i = i + 1;
+    return i;
   }
-  return fibonacci(n - 1) + fibonacci(n - 2);
+
+  return count;
 }
 
-function factorial(n) {
-  if(n < 2) {
-    return n;
-  }
-  return n * factorial(n - 1);
-}
-
-print fibonacci(5);
-print factorial(5);
-
-const a = 30;
-print a;
-
-print null ?? "hello world!";
-
-print !!10;             // true
-print !!0;              // false
-print !!"hello world!"; // true
-print !!"";             // false
-print !!null;           // false
-   
+const count = makeCounter();
+print count();
+print count();
 
