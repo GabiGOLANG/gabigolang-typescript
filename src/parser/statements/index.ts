@@ -8,3 +8,4 @@ export * from "./While";
 export * from "./Function";
 export * from "./Return";
 export * from "./Const";
+export * from "./Class";

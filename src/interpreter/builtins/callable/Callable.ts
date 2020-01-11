@@ -1,5 +1,5 @@
-import Interpreter from "../Interpreter";
-import { Maybe } from "../../lib/Std";
+import Interpreter from "../../Interpreter";
+import { Maybe } from "../../../lib/Std";
 
 export default interface Callable {
   __arity(): number;

@@ -19,7 +19,9 @@ const keywords = new Map<string, TokenType>([
   ["true", TokenType.TRUE],
   ["let", TokenType.LET],
   ["const", TokenType.CONST],
-  ["while", TokenType.WHILE]
+  ["while", TokenType.WHILE],
+  ["class", TokenType.CLASS],
+  ["static", TokenType.STATIC]
 ]);
 
 const tokens = new Map<string, TokenType>([
@@ -172,7 +174,7 @@ export default class Lexer {
               not(this.endOfSource())
             )
           ) {
-            if (this.nextToken() === "\n") {
+            if (equal(this.nextToken(), "\n")) {
               ++this.line;
             }
           }

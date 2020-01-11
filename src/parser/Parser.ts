@@ -99,10 +99,12 @@ export default class Parser {
     if (this.match(TokenType.NUMBER, TokenType.STRING)) {
       return new Expr.Literal(this.previous().literal);
     }
+    if (this.match(TokenType.THIS)) {
+      return new Expr.This(this.previous());
+    }
     if (this.match(TokenType.IDENTIFIER)) {
       return new Expr.Variable(this.previous());
     }
-
     if (this.match(TokenType.LEFT_PAREN)) {
       const expr = this.expression();
       this.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
@@ -144,8 +146,19 @@ export default class Parser {
   private call(): Expr.Expression {
     let expr = this.primary();
 
-    while (this.match(TokenType.LEFT_PAREN)) {
-      expr = this.finishCall(expr);
+    while (true) {
+      if (this.match(TokenType.LEFT_PAREN)) {
+        expr = this.finishCall(expr);
+      } else if (this.match(TokenType.DOT)) {
+        const propertyName = this.consume(
+          TokenType.IDENTIFIER,
+          "Expect property name after object access operator"
+        );
+
+        expr = new Expr.AccessObjectProperty(expr, propertyName);
+      } else {
+        break;
+      }
     }
 
     return expr;
@@ -390,8 +403,11 @@ export default class Parser {
       const equals = this.previous();
       const value = this.assignment();
 
-      if (expr instanceof Expr.Variable)
+      if (expr instanceof Expr.Variable) {
         return new Expr.Assign(expr.name, value);
+      } else if (expr instanceof Expr.AccessObjectProperty) {
+        return new Expr.SetObjectProperty(expr.object, expr.token, value);
+      }
 
       this.error(equals, "Invalid assignment target");
     }
@@ -401,7 +417,7 @@ export default class Parser {
 
   private expression = (): Expr.Expression => this.assignment();
 
-  private function(kind: string): Stmt.Function {
+  private functionDeclaration(kind: string): Stmt.Function {
     const name = this.consume(TokenType.IDENTIFIER, `Expect ${kind} name`);
     this.consume(TokenType.LEFT_PAREN, `Expect '(' after ${kind} name`);
 
@@ -452,10 +468,38 @@ export default class Parser {
     return new Stmt.Const(name, initializer);
   }
 
+  private classDeclaration(): Stmt.Statement {
+    const className = this.consume(
+      TokenType.IDENTIFIER,
+      "Expect identifier class class keyword"
+    );
+
+    this.consume(TokenType.LEFT_BRACE, "Expect { after class identifier");
+
+    const classMethods: Stmt.Function[] = [];
+    const staticMethods: Stmt.Function[] = [];
+
+    while (
+      and(not(this.check(TokenType.RIGHT_BRACE)), not(this.endOfSource()))
+    ) {
+      if (this.check(TokenType.STATIC)) {
+        this.advance();
+        staticMethods.push(this.functionDeclaration("static method"));
+      }
+      classMethods.push(this.functionDeclaration("method"));
+    }
+
+    this.consume(TokenType.RIGHT_BRACE, "Expect } after class body");
+    return new Stmt.Class(className, classMethods, staticMethods);
+  }
+
   private declaration(): Maybe<Stmt.Statement> {
     try {
+      if (this.match(TokenType.CLASS)) {
+        return this.classDeclaration();
+      }
       if (this.match(TokenType.FUNCTION)) {
-        return this.function("function");
+        return this.functionDeclaration("function");
       }
       if (this.match(TokenType.LET)) {
         return this.letDeclaration();

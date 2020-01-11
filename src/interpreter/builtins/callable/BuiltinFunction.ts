@@ -1,14 +1,22 @@
 import Callable from "./Callable";
-import * as Stmt from "../../parser/statements";
-import Environment from "../environment/Environment";
-import Interpreter from "../Interpreter";
-import { Maybe } from "../../lib/Std";
+import * as Stmt from "../../../parser/statements";
+import Environment from "../../environment/Environment";
+import Interpreter from "../../Interpreter";
+import { Maybe } from "../../../lib/Std";
+import BuiltinClassInstance from "../class/BuiltinClassInstance";
 
 export default class BuiltinFunction implements Callable {
   constructor(
     public readonly declaration: Stmt.Function,
     private readonly closure: Environment
   ) {}
+
+  public __bind(instance: BuiltinClassInstance): BuiltinFunction {
+    const environment = new Environment()
+      .setParentEnvironment(this.closure)
+      .define("this", instance);
+    return new BuiltinFunction(this.declaration, environment);
+  }
 
   public __arity = (): number => this.declaration.params.length;
 

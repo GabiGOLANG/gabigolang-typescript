@@ -6,10 +6,13 @@ import Token from "../lexer/Token";
 import InvalidInitializerException from "./exceptions/InvalidInitializer";
 import Interpreter from "../interpreter/Interpreter";
 import UnexpectedTokenException from "./exceptions/UnexpectedToken";
+import { equal, not } from "../lib/Std";
 
 enum ScopeTypes {
   NONE,
-  FUNCTION
+  FUNCTION,
+  METHOD,
+  CLASS_CONSTRUCTOR
 }
 
 export default class Resolver
@@ -32,7 +35,7 @@ export default class Resolver
     this.scopes[this.scopes.length - 1];
 
   private declare(token: Token): void {
-    if (this.scopes.length === 0) {
+    if (equal(this.scopes.length, 0)) {
       return;
     }
 
@@ -47,7 +50,7 @@ export default class Resolver
   }
 
   private define(token: Token): void {
-    if (this.scopes.length === 0) {
+    if (equal(this.scopes.length, 0)) {
       return;
     }
 
@@ -70,7 +73,7 @@ export default class Resolver
     statement: Stmt.Function,
     scopeType: ScopeTypes
   ): void {
-    const enclosingScopeType = this.currentScopeType;
+    const parentScopeType = this.currentScopeType;
     this.currentScopeType = scopeType;
 
     this.beginScope();
@@ -85,7 +88,7 @@ export default class Resolver
 
     this.endScope();
 
-    this.currentScopeType = enclosingScopeType;
+    this.currentScopeType = parentScopeType;
   }
 
   public visitBlockStatement(statement: Stmt.Block): void {
@@ -119,7 +122,7 @@ export default class Resolver
       this.scopes.length > 0 &&
       this.getCurrentScope().get(expression.name.lexeme as string) === false
     ) {
-      throw new InvalidInitializerException(expression);
+      throw new InvalidInitializerException(expression.name.lexeme as string);
     }
 
     this.resolveLocal(expression, expression.name);
@@ -153,9 +156,14 @@ export default class Resolver
   }
 
   public visitReturnStatement(statement: Stmt.Return): void {
-    if (this.currentScopeType === ScopeTypes.NONE) {
+    if (equal(this.currentScopeType, ScopeTypes.NONE)) {
       throw new UnexpectedTokenException(statement.keyword.lexeme as string);
     }
+
+    if (equal(this.currentScopeType, ScopeTypes.CLASS_CONSTRUCTOR)) {
+      console.error("Invalid <return> statement from class constructor");
+    }
+
     if (statement.value) {
       statement.value.accept(this);
     }
@@ -164,6 +172,29 @@ export default class Resolver
   public visitWhileStatement(statement: Stmt.While): void {
     statement.condition.accept(this);
     statement.body.accept(this);
+  }
+
+  public visitClassStatement(statement: Stmt.Class): void {
+    const parentScopeType = this.currentScopeType;
+    this.currentScopeType = ScopeTypes.METHOD;
+
+    if (equal(statement.name.lexeme as string, "constructor")) {
+      this.currentScopeType = ScopeTypes.CLASS_CONSTRUCTOR;
+    }
+
+    this.define(statement.name);
+    this.declare(statement.name);
+
+    this.beginScope();
+    this.getCurrentScope().set("this", true);
+
+    for (const method of statement.methods) {
+      this.resolveFunction(method, ScopeTypes.METHOD);
+    }
+
+    this.endScope();
+
+    this.currentScopeType = parentScopeType;
   }
 
   public visitBinaryExpression(expression: Expr.Binary): void {
@@ -179,6 +210,12 @@ export default class Resolver
     }
   }
 
+  public visitAccessObjectPropertyExpression(
+    expression: Expr.AccessObjectProperty
+  ): void {
+    expression.object.accept(this);
+  }
+
   public visitGroupingExpression(expression: Expr.Grouping): void {
     expression.expression.accept(this);
   }
@@ -190,6 +227,21 @@ export default class Resolver
   public visitLogicalExpression(expression: Expr.Logical): void {
     expression.left.accept(this);
     expression.right.accept(this);
+  }
+
+  public visitSetObjectPropertyExpression(
+    expression: Expr.SetObjectProperty
+  ): void {
+    expression.value.accept(this);
+    expression.object.accept(this);
+  }
+
+  public visitThisExpression(expression: Expr.This): void {
+    if (not(equal(this.currentScopeType, ScopeTypes.METHOD))) {
+      console.error("Invalid use of <this> outside of class instance");
+      return;
+    }
+    this.resolveLocal(expression, expression.name);
   }
 
   public visitUnaryExpression(expression: Expr.Unary): void {

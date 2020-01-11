@@ -10,4 +10,5 @@ export default interface StatementVisitor<T> {
   visitWhileStatement(statement: Stmt.While): T;
   visitFunctionStatement(statement: Stmt.Function): T;
   visitReturnStatement(statement: Stmt.Return): T;
+  visitClassStatement(statement: Stmt.Class): T;
 }

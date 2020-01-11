@@ -22,9 +22,13 @@ import Environment from "./environment/Environment";
 import ObjectIsNotCallableException from "./exceptions/ObjectIsNotCallable";
 import InvalidNumberOfArgumentsException from "./exceptions/InvalidNumberOfArguments";
 import { Statement } from "../parser/statements";
-import BuiltinFunction from "./callable/BuiltinFunction";
+import BuiltinFunction from "./builtins/callable/BuiltinFunction";
 import ReturnException from "./exceptions/Return";
 import { Expression } from "../parser/expressions";
+import BuiltinClass from "./builtins/class/BuiltinClass";
+import BuiltinClassInstance from "./builtins/class/BuiltinClassInstance";
+import InvalidPropertyAccessException from "./exceptions/InvalidPropertyAccess";
+import RuntimeException from "./exceptions/Runtime";
 
 export default class Interpreter
   implements ExpressionVisitor<any>, StatementVisitor<void> {
@@ -139,6 +143,21 @@ export default class Interpreter
     return expression.right.accept(this);
   }
 
+  public visitSetObjectPropertyExpression(expression: Expr.SetObjectProperty) {
+    const object = expression.object.accept(this);
+
+    if (not(object instanceof BuiltinClassInstance)) {
+      throw new RuntimeException(`Object <${object}> is not a class instance`);
+    }
+
+    const value = expression.value.accept(this);
+    const propertyName = expression.token.lexeme as string;
+    object.setProperty(propertyName, value);
+  }
+
+  public visitThisExpression = (expression: Expr.This) =>
+    this.lookUpVariable(expression);
+
   public visitCallExpression(expression: Expr.Call) {
     const callee = expression.callee.accept(this);
 
@@ -158,6 +177,37 @@ export default class Interpreter
     }
 
     return callee.__call(this, args);
+  }
+
+  public visitAccessObjectPropertyExpression(
+    expression: Expr.AccessObjectProperty
+  ) {
+    const object = expression.object.accept(this);
+    const propertyName = expression.token.lexeme as string;
+
+    if (object instanceof BuiltinClass) {
+      const method = object.getStaticMethod(propertyName);
+
+      if (!method) {
+        throw new RuntimeException(
+          `Object <${object.toString()}> has no static method called <${propertyName}>`
+        );
+      }
+      return method;
+    }
+
+    if (object instanceof BuiltinClassInstance) {
+      const method = object.getProperty(propertyName);
+
+      if (!method) {
+        throw new RuntimeException(
+          `Object <${object.toString()}> has no property called <${propertyName}>`
+        );
+      }
+      return method;
+    }
+
+    throw new InvalidPropertyAccessException(propertyName);
   }
 
   public visitExpressionStatement = (statement: Stmt.Expression) =>
@@ -184,6 +234,34 @@ export default class Interpreter
     environment.setParentEnvironment(this.environment);
 
     this.executeBlock(statement.statements, environment);
+  }
+
+  public visitClassStatement(statement: Stmt.Class): void {
+    const className = statement.name.lexeme as string;
+    this.environment.define(className, null);
+
+    const classMethods = new Map<string, BuiltinFunction>();
+    for (const method of statement.methods) {
+      classMethods.set(
+        method.name.lexeme as string,
+        new BuiltinFunction(method, this.environment)
+      );
+    }
+
+    const staticMethods = new Map<string, BuiltinFunction>();
+    for (const method of statement.staticMethods) {
+      staticMethods.set(
+        method.name.lexeme as string,
+        new BuiltinFunction(method, this.environment)
+      );
+    }
+
+    const builtinClass = new BuiltinClass(
+      className,
+      classMethods,
+      staticMethods
+    );
+    this.environment.assign(statement.name, builtinClass);
   }
 
   public executeBlock(block: Statement[], environment: Environment) {

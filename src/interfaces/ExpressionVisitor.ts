@@ -9,4 +9,7 @@ export default interface ExpressionVisitor<T> {
   visitAssignExpression(expression: Expr.Assign): T;
   visitLogicalExpression(expression: Expr.Logical): T;
   visitCallExpression(expression: Expr.Call): T;
+  visitAccessObjectPropertyExpression(expression: Expr.AccessObjectProperty): T;
+  visitSetObjectPropertyExpression(expression: Expr.SetObjectProperty): T;
+  visitThisExpression(expression: Expr.This): T;
 }

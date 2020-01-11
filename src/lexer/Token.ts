@@ -31,6 +31,7 @@ export enum TokenType {
   NUMBER,
 
   // Keywords.
+  STATIC,
   AND,
   CLASS,
   ELSE,

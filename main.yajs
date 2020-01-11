@@ -1,21 +1,20 @@
-// comment
-/* 
- block
- comment
-*/
-
-function makeCounter() {
-  let i = 0;
-
-  function count() {
-    i = i + 1;
-    return i;
+class User {
+  constructor(name, age){
+    this.name = name;
+    this.age = age;
   }
 
-  return count;
+  static test() {
+    print "static works";
+  }
+
+  dump() {
+    print this.name + ", " + this.age;
+  }
 }
 
-const count = makeCounter();
-print count();
-print count();
+User.test();
 
+const user = User("john", 20);
+user.dump();
+user.test();

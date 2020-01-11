@@ -3,22 +3,18 @@
 #### The whole code is pretty much based on this book https://craftinginterpreters.com/
 
 ```js
-function fibonacci(n) {
-  if(n < 2) {
-    return n;
-  }
-  return fibonacci(n - 1) + fibonacci(n - 2);
+function dumpUser(user) {
+  print user.name + " " + user.surname + ", " + user.age;
 }
 
-function factorial(n) {
-  if(n < 2) {
-    return n;
-  }
-  return n * factorial(n - 1);
-}
+class User {}
 
-print fibonacci(5);
-print factorial(5);
+const user = User();
+user.name = "john";
+user.surname = "doe";
+user.age = 20;
+
+dumpUser(user);
 ```
 
 #### Usage
@@ -86,22 +82,25 @@ const myVariable; // error, const variable must be initialized
 
 ```js
 const a = null ?? "hello world"; // hello world
-//
-//
+
+...
+
 function getValue() {
   return "value";
 }
 
 const a = null ?? getValue(); // value
-//
-//
+
+...
+
 function getValue() {
   return 10;
 }
 
 const b = getValue() ?? "other value"; // 10;
-//
-//
+
+...
+
 function getValue() {
   return null;
 }
@@ -156,35 +155,43 @@ print i; // 10;
 
 ```js
 if(true) {
-  ...
+
 }
 
+...
+
 if(true and false) {
-  ...
+
 } else {
 
 }
 
+...
+
 if(true or false) {
-  ...
+
 } else {
 
 }
 
 if(!false) {
-  ...
+
 }
+
+...
 
 let a = 10;
 if(a < 20) {
-  ...
+
 }
+
+...
 
 let x = "hello";
 if(x == "hello world!"){
-  ...
+
 } else {
-  ...
+
 }
 ```
 
@@ -192,16 +199,20 @@ if(x == "hello world!"){
 
 ```js
 for(let i = 0; i < 10; i = i + 1) {
-  ...
+
 }
+
+...
 
 let j = 0;
 for( ; j < 5; j = j + 1) {
-  ...
+
 }
 
+...
+
 for( ; ; ) {
-  ...
+
 }
 ```
 
@@ -211,6 +222,8 @@ for( ; ; ) {
 while(true) {
   ...
 }
+
+...
 
 let i = 0;
 while(i < 10) {
@@ -228,12 +241,18 @@ function sayHello(name){
 let name = "world";
 sayHello(name);
 
+...
+
 function fibonacci(n) {
   if(n < 2) {
     return n;
   }
   return fibonacci(n - 1) + fibonacci(n - 2);
 }
+
+print fibonacci(5);
+
+...
 
 function factorial(n) {
   if(n < 2) {
@@ -242,7 +261,6 @@ function factorial(n) {
   return n * factorial(n - 1);
 }
 
-print fibonacci(5);
 print factorial(5);
 ```
 
@@ -263,4 +281,75 @@ function makeCounter() {
 const count = makeCounter();
 print count();
 print count();
+```
+
+> Classes
+
+```js
+class Foo {}
+const fooInstance = Foo();
+
+...
+
+class Foo {
+  sayHello(name) {
+    print "hello " + name;
+  }
+}
+
+const fooInstance = Foo();
+fooInstance.sayHello("world!");
+
+...
+
+function dumpUser(user) {
+  print user.name + " " + user.surname + ", " + user.age;
+}
+
+class User {}
+
+const user = User();
+user.name = "john";
+user.surname = "doe";
+user.age = 20;
+
+dumpUser(user);
+
+...
+
+class User {
+  dump() {
+    print this.name + ", " + this.age;
+  }
+}
+
+const user = User();
+user.name = "john";
+user.age = 20;
+
+user.dump();
+
+...
+
+class User {
+  constructor(name, age){
+    this.name = name;
+    this.age = age;
+  }
+
+  static test() {
+    print "static works";
+  }
+
+  dump() {
+    print this.name + ", " + this.age;
+  }
+}
+
+User.test();
+
+const user = User("john", 20);
+user.dump();
+
+user.test() // Error: Object <<User>> has no property called <test>
 ```
