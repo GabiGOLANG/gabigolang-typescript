@@ -17,4 +17,3 @@ User.test();
 
 const user = User("john", 20);
 user.dump();
-user.test();

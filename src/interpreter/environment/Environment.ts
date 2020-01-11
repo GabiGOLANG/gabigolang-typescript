@@ -2,7 +2,6 @@ import Token from "../../lexer/Token";
 import UndefinedVariableException from "../exceptions/UndefinedVariable";
 import IdentifierAlreadyDeclared from "../exceptions/IdentifierAlreadyDeclared";
 import AssignmentToConstantVariableException from "../exceptions/AssignmentToConstantVariable";
-import { or } from "../../lib/Std";
 
 export default class Environment {
   private parentEnvironment: Environment;
@@ -15,7 +14,7 @@ export default class Environment {
   }
 
   public define(name: string, value: any, __const: boolean = false): this {
-    if (or(this.values.has(name), this.constValues.has(name))) {
+    if (this.values.has(name) || this.constValues.has(name)) {
       throw new IdentifierAlreadyDeclared(name);
     }
 

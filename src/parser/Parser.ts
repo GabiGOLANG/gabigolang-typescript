@@ -1,5 +1,5 @@
 import Token, { TokenType } from "../lexer/Token";
-import { not, equal, and, Maybe } from "../lib/Std";
+import { Maybe } from "../lib/Std";
 import * as Expr from "./expressions";
 import * as Stmt from "./statements";
 import ParserException from "./exceptions/ParserException";
@@ -20,13 +20,13 @@ export default class Parser {
   private peek = (offset: number = 0): Token =>
     this.tokens[this.current + offset];
 
-  private endOfSource = () => equal(this.peek().type, TokenType.END_OF_FILE);
+  private endOfSource = () => this.peek().type === TokenType.END_OF_FILE;
 
   private synchronize(): void {
     this.advance();
 
-    while (not(this.endOfSource())) {
-      if (equal(this.previous().type, TokenType.SEMICOLON)) {
+    while (!this.endOfSource()) {
+      if (this.previous().type === TokenType.SEMICOLON) {
         return;
       }
 
@@ -47,14 +47,14 @@ export default class Parser {
   }
 
   private advance(): Token {
-    if (not(this.endOfSource())) {
+    if (!this.endOfSource()) {
       ++this.current;
     }
     return this.previous();
   }
 
   private check = (type: TokenType): boolean =>
-    this.endOfSource() ? false : equal(this.peek().type, type);
+    this.endOfSource() ? false : this.peek().type === type;
 
   private match(...types: TokenType[]): boolean {
     for (const type of types) {
@@ -68,7 +68,7 @@ export default class Parser {
   }
 
   private error(token: Token, message: string): void {
-    if (equal(token.type, TokenType.END_OF_FILE)) {
+    if (token.type === TokenType.END_OF_FILE) {
       console.error(token.line, " at end", message);
     } else {
       console.error(token.line, ` at "${token.lexeme}"`, message);
@@ -118,7 +118,7 @@ export default class Parser {
   private finishCall(callee: Expr.Expression): Expr.Expression {
     const args: Expr.Expression[] = [];
 
-    if (not(this.check(TokenType.RIGHT_PAREN))) {
+    if (!this.check(TokenType.RIGHT_PAREN)) {
       while (true) {
         args.push(this.expression());
 
@@ -129,7 +129,7 @@ export default class Parser {
           );
         }
 
-        if (not(this.match(TokenType.COMMA))) {
+        if (!this.match(TokenType.COMMA)) {
           break;
         }
       }
@@ -269,9 +269,7 @@ export default class Parser {
   private block(): Stmt.Statement[] {
     const statements: Stmt.Statement[] = [];
 
-    while (
-      and(not(this.check(TokenType.RIGHT_BRACE)), not(this.endOfSource()))
-    ) {
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.endOfSource()) {
       statements.push(this.declaration()!);
     }
 
@@ -307,13 +305,13 @@ export default class Parser {
       ? this.letDeclaration()
       : this.expressionStatement();
 
-    let condition: Maybe<Expr.Expression> = not(this.check(TokenType.SEMICOLON))
+    let condition: Maybe<Expr.Expression> = !this.check(TokenType.SEMICOLON)
       ? this.expression()
       : null;
 
     this.consume(TokenType.SEMICOLON, "Expect ';' after for loop condition");
 
-    const increment = not(this.check(TokenType.RIGHT_PAREN))
+    const increment = !this.check(TokenType.RIGHT_PAREN)
       ? this.expression()
       : null;
 
@@ -325,7 +323,7 @@ export default class Parser {
       ? new Stmt.Block([body, new Stmt.Expression(increment)])
       : null;
 
-    if (not(condition)) {
+    if (!condition) {
       condition = new Expr.Literal(true);
     }
 
@@ -341,9 +339,7 @@ export default class Parser {
   private returnStatement(): Stmt.Statement {
     const keyword = this.previous();
 
-    const value = not(this.check(TokenType.SEMICOLON))
-      ? this.expression()
-      : null;
+    const value = !this.check(TokenType.SEMICOLON) ? this.expression() : null;
 
     this.consume(TokenType.SEMICOLON, "Expect ';' after return statement");
     return new Stmt.Return(keyword, value);
@@ -423,7 +419,7 @@ export default class Parser {
 
     const parameters: Token[] = [];
 
-    if (not(this.check(TokenType.RIGHT_PAREN))) {
+    if (!this.check(TokenType.RIGHT_PAREN)) {
       while (true) {
         if (parameters.length > 254) {
           this.error(
@@ -436,7 +432,7 @@ export default class Parser {
           this.consume(TokenType.IDENTIFIER, `Expect ${kind} parameter name`)
         );
 
-        if (not(this.match(TokenType.COMMA))) {
+        if (!this.match(TokenType.COMMA)) {
           break;
         }
       }
@@ -479,9 +475,7 @@ export default class Parser {
     const classMethods: Stmt.Function[] = [];
     const staticMethods: Stmt.Function[] = [];
 
-    while (
-      and(not(this.check(TokenType.RIGHT_BRACE)), not(this.endOfSource()))
-    ) {
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.endOfSource()) {
       if (this.check(TokenType.STATIC)) {
         this.advance();
         staticMethods.push(this.functionDeclaration("static method"));
@@ -518,10 +512,10 @@ export default class Parser {
   public parse(): ParserResult {
     const statements: any = [];
 
-    while (not(this.endOfSource())) {
+    while (!this.endOfSource()) {
       statements.push(this.declaration());
     }
 
-    return { ok: not(this.hasError), statements };
+    return { ok: !this.hasError, statements };
   }
 }

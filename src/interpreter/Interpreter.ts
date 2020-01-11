@@ -2,21 +2,6 @@ import ExpressionVisitor from "../interfaces/ExpressionVisitor";
 import * as Expr from "../parser/expressions";
 import * as Stmt from "../parser/statements";
 import { TokenType } from "../lexer/Token";
-import {
-  equal,
-  not,
-  greaterThanOrEqual,
-  lessThanOrEqual,
-  plus,
-  minus,
-  divide,
-  times,
-  greaterThan,
-  lessThan,
-  negate,
-  isTruthy,
-  mod
-} from "../lib/Std";
 import StatementVisitor from "../interfaces/StatementVisitor";
 import Environment from "./environment/Environment";
 import ObjectIsNotCallableException from "./exceptions/ObjectIsNotCallable";
@@ -46,27 +31,27 @@ export default class Interpreter
 
     switch (expression.operation.type) {
       case TokenType.PLUS:
-        return plus(left, right);
+        return left + right;
       case TokenType.MINUS:
-        return minus(left, right);
+        return left - right;
       case TokenType.SLASH:
-        return divide(left, right);
+        return left / right;
       case TokenType.STAR:
-        return times(left, right);
+        return left * right;
       case TokenType.GREATER:
-        return greaterThan(left, right);
+        return left > right;
       case TokenType.GREATER_EQUAL:
-        return greaterThanOrEqual(left, right);
+        return left >= right;
       case TokenType.LESS:
-        return lessThan(left, right);
+        return left < right;
       case TokenType.LESS_EQUAL:
-        return lessThanOrEqual(left, right);
+        return left <= right;
       case TokenType.BANG_EQUAL:
-        return not(equal(left, right));
+        return left !== right;
       case TokenType.EQUAL_EQUAL:
-        return equal(left, right);
+        return left === right;
       case TokenType.MOD:
-        return mod(left, right);
+        return left % right;
       case TokenType.NULL_COALESCING:
         return this.visitNullCoalescingExpression(left, right);
       default:
@@ -75,9 +60,9 @@ export default class Interpreter
   }
 
   private visitNullCoalescingExpression(left: Expression, right: Expression) {
-    if (not(equal(left, null))) {
+    if (left !== null) {
       const result = left.accept(this);
-      return not(equal(result, null)) ? result : right.accept(this);
+      return result !== null ? result : right.accept(this);
     }
     return right.accept(this);
   }
@@ -95,11 +80,11 @@ export default class Interpreter
 
     switch (expression.operation.type) {
       case TokenType.BANG:
-        return not(isTruthy(right));
+        return !right;
       case TokenType.DOUBLE_BANG:
-        return isTruthy(right);
+        return !!right;
       case TokenType.MINUS:
-        return negate(right);
+        return -right;
       default:
         return null;
     }
@@ -131,11 +116,11 @@ export default class Interpreter
     const left = expression.left.accept(this);
 
     if (expression.operator.type === TokenType.OR) {
-      if (isTruthy(left)) {
+      if (left) {
         return left;
       }
     } else {
-      if (not(isTruthy(left))) {
+      if (left) {
         return left;
       }
     }
@@ -146,7 +131,7 @@ export default class Interpreter
   public visitSetObjectPropertyExpression(expression: Expr.SetObjectProperty) {
     const object = expression.object.accept(this);
 
-    if (not(object instanceof BuiltinClassInstance)) {
+    if (!(object instanceof BuiltinClassInstance)) {
       throw new RuntimeException(`Object <${object}> is not a class instance`);
     }
 
@@ -161,14 +146,14 @@ export default class Interpreter
   public visitCallExpression(expression: Expr.Call) {
     const callee = expression.callee.accept(this);
 
-    if (not("__call" in callee)) {
+    if (!("__call" in callee)) {
       throw new ObjectIsNotCallableException(callee);
     }
 
     const args: any = [];
     expression.args.forEach(arg => args.push(arg.accept(this)));
 
-    if (not(equal(args.length, callee.__arity()))) {
+    if (args.length !== callee.__arity()) {
       throw new InvalidNumberOfArgumentsException(
         callee.__name(),
         callee.__arity(),
@@ -277,7 +262,7 @@ export default class Interpreter
   }
 
   public visitIfStatement(statement: Stmt.If) {
-    if (isTruthy(statement.condition.accept(this))) {
+    if (statement.condition.accept(this)) {
       statement.thenBranch.accept(this);
     } else if (statement.elseBranch) {
       statement.elseBranch.accept(this);
@@ -285,7 +270,7 @@ export default class Interpreter
   }
 
   public visitWhileStatement(statement: Stmt.While) {
-    while (isTruthy(statement.condition.accept(this))) {
+    while (statement.condition.accept(this)) {
       statement.body.accept(this);
     }
   }

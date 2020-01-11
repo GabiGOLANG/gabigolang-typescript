@@ -33,5 +33,6 @@ export default class BuiltinClass implements Callable {
   public getMethod = (name: string): Maybe<BuiltinFunction> =>
     this.methods.get(name);
 
-  public getStaticMethod = (name: string) => this.staticMethods.get(name);
+  public getStaticMethod = (name: string): Maybe<BuiltinFunction> =>
+    this.staticMethods.get(name);
 }

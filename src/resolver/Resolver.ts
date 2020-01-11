@@ -6,7 +6,6 @@ import Token from "../lexer/Token";
 import InvalidInitializerException from "./exceptions/InvalidInitializer";
 import Interpreter from "../interpreter/Interpreter";
 import UnexpectedTokenException from "./exceptions/UnexpectedToken";
-import { equal, not } from "../lib/Std";
 
 enum ScopeTypes {
   NONE,
@@ -35,7 +34,7 @@ export default class Resolver
     this.scopes[this.scopes.length - 1];
 
   private declare(token: Token): void {
-    if (equal(this.scopes.length, 0)) {
+    if (this.scopes.length === 0) {
       return;
     }
 
@@ -50,7 +49,7 @@ export default class Resolver
   }
 
   private define(token: Token): void {
-    if (equal(this.scopes.length, 0)) {
+    if (this.scopes.length === 0) {
       return;
     }
 
@@ -156,11 +155,11 @@ export default class Resolver
   }
 
   public visitReturnStatement(statement: Stmt.Return): void {
-    if (equal(this.currentScopeType, ScopeTypes.NONE)) {
+    if (this.currentScopeType === ScopeTypes.NONE) {
       throw new UnexpectedTokenException(statement.keyword.lexeme as string);
     }
 
-    if (equal(this.currentScopeType, ScopeTypes.CLASS_CONSTRUCTOR)) {
+    if (this.currentScopeType === ScopeTypes.CLASS_CONSTRUCTOR) {
       console.error("Invalid <return> statement from class constructor");
     }
 
@@ -178,7 +177,7 @@ export default class Resolver
     const parentScopeType = this.currentScopeType;
     this.currentScopeType = ScopeTypes.METHOD;
 
-    if (equal(statement.name.lexeme as string, "constructor")) {
+    if ((statement.name.lexeme as string) === "constructor") {
       this.currentScopeType = ScopeTypes.CLASS_CONSTRUCTOR;
     }
 
@@ -237,7 +236,7 @@ export default class Resolver
   }
 
   public visitThisExpression(expression: Expr.This): void {
-    if (not(equal(this.currentScopeType, ScopeTypes.METHOD))) {
+    if (this.currentScopeType !== ScopeTypes.METHOD) {
       console.error("Invalid use of <this> outside of class instance");
       return;
     }

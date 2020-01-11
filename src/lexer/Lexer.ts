@@ -1,5 +1,4 @@
 import Token, { TokenType } from "./Token";
-import { not, or, and, equal } from "../lib/Std";
 
 const keywords = new Map<string, TokenType>([
   ["and", TokenType.AND],
@@ -62,9 +61,7 @@ export default class Lexer {
     this.endOfSource() ? "\0" : this.source[this.current + offset];
 
   private match(expected: string): boolean {
-    if (
-      or(this.endOfSource(), not(equal(this.source[this.current], expected)))
-    ) {
+    if (this.endOfSource() || this.source[this.current] !== expected) {
       return false;
     }
 
@@ -73,7 +70,7 @@ export default class Lexer {
   }
 
   private string(): void {
-    while (and(not(equal(this.peek(), '"')), not(this.endOfSource()))) {
+    while (this.peek() !== '"' && !this.endOfSource()) {
       if (this.peek() === "\n") {
         ++this.line;
       }
@@ -162,19 +159,18 @@ export default class Lexer {
         break;
       case "/":
         if (this.match("/")) {
-          while (and(not(equal(this.peek(), "\n")), not(this.endOfSource()))) {
+          while (this.peek() !== "\n" && !this.endOfSource()) {
             this.nextToken();
           }
         } else if (this.match("*")) {
           const blockCommentStart = this.line;
 
           while (
-            and(
-              not(and(equal(this.peek(), "*"), equal(this.peek(1), "/"))),
-              not(this.endOfSource())
-            )
+            this.peek() !== "*" &&
+            this.peek(1) !== "/" &&
+            !this.endOfSource()
           ) {
-            if (equal(this.nextToken(), "\n")) {
+            if (this.nextToken() === "\n") {
               ++this.line;
             }
           }
@@ -214,7 +210,7 @@ export default class Lexer {
   }
 
   public lex(): Token[] {
-    while (not(this.endOfSource())) {
+    while (!this.endOfSource()) {
       this.start = this.current;
       this.scanToken(this.nextToken());
     }
