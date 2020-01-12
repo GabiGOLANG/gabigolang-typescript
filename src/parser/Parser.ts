@@ -26,10 +26,6 @@ export default class Parser {
     this.advance();
 
     while (!this.endOfSource()) {
-      if (this.previous().type === TokenType.SEMICOLON) {
-        return;
-      }
-
       switch (this.peek().type) {
         case TokenType.CLASS:
         case TokenType.FUNCTION:
@@ -256,13 +252,13 @@ export default class Parser {
 
   private expressionStatement(): Stmt.Statement {
     const expr = this.expression();
-    this.consume(TokenType.SEMICOLON, "Expect ';' after expression");
+
     return new Stmt.Expression(expr);
   }
 
   private printStatement(): Stmt.Statement {
     const value = this.expression();
-    this.consume(TokenType.SEMICOLON, "Expect ';' after value.");
+
     return new Stmt.Print(value);
   }
 
@@ -305,11 +301,11 @@ export default class Parser {
       ? this.letDeclaration()
       : this.expressionStatement();
 
-    let condition: Maybe<Expr.Expression> = !this.check(TokenType.SEMICOLON)
+    let condition: Maybe<Expr.Expression> = !this.check(TokenType.SEMI_COLON)
       ? this.expression()
       : null;
 
-    this.consume(TokenType.SEMICOLON, "Expect ';' after for loop condition");
+    this.consume(TokenType.SEMI_COLON, "Expect ';' after for loop condition");
 
     const increment = !this.check(TokenType.RIGHT_PAREN)
       ? this.expression()
@@ -339,9 +335,8 @@ export default class Parser {
   private returnStatement(): Stmt.Statement {
     const keyword = this.previous();
 
-    const value = !this.check(TokenType.SEMICOLON) ? this.expression() : null;
+    const value = this.check(TokenType.RIGHT_BRACE) ? null : this.expression();
 
-    this.consume(TokenType.SEMICOLON, "Expect ';' after return statement");
     return new Stmt.Return(keyword, value);
   }
 
@@ -449,7 +444,6 @@ export default class Parser {
     const name = this.consume(TokenType.IDENTIFIER, "Expect variable name");
     const initializer = this.match(TokenType.EQUAL) ? this.expression() : null;
 
-    this.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration");
     return new Stmt.Let(name, initializer);
   }
 
@@ -460,15 +454,20 @@ export default class Parser {
       `Expect initializer for const variable '${name.lexeme}'`
     );
     const initializer = this.expression();
-    this.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration");
     return new Stmt.Const(name, initializer);
   }
 
   private classDeclaration(): Stmt.Statement {
     const className = this.consume(
       TokenType.IDENTIFIER,
-      "Expect identifier class class keyword"
+      "Expect identifier after class keyword"
     );
+
+    let superclass: Maybe<Expr.Variable> = null;
+    if (this.match(TokenType.CLASS_EXTENDS)) {
+      this.consume(TokenType.IDENTIFIER, "Expect superclass name");
+      superclass = new Expr.Variable(this.previous());
+    }
 
     this.consume(TokenType.LEFT_BRACE, "Expect { after class identifier");
 
@@ -479,12 +478,13 @@ export default class Parser {
       if (this.check(TokenType.STATIC)) {
         this.advance();
         staticMethods.push(this.functionDeclaration("static method"));
+      } else {
+        classMethods.push(this.functionDeclaration("method"));
       }
-      classMethods.push(this.functionDeclaration("method"));
     }
 
     this.consume(TokenType.RIGHT_BRACE, "Expect } after class body");
-    return new Stmt.Class(className, classMethods, staticMethods);
+    return new Stmt.Class(className, superclass, classMethods, staticMethods);
   }
 
   private declaration(): Maybe<Stmt.Statement> {

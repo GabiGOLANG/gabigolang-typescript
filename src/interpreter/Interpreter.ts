@@ -11,7 +11,6 @@ import BuiltinFunction from "./builtins/callable/BuiltinFunction";
 import ReturnException from "./exceptions/Return";
 import { Expression } from "../parser/expressions";
 import BuiltinClass from "./builtins/class/BuiltinClass";
-import BuiltinClassInstance from "./builtins/class/BuiltinClassInstance";
 import InvalidPropertyAccessException from "./exceptions/InvalidPropertyAccess";
 import RuntimeException from "./exceptions/Runtime";
 
@@ -131,7 +130,7 @@ export default class Interpreter
   public visitSetObjectPropertyExpression(expression: Expr.SetObjectProperty) {
     const object = expression.object.accept(this);
 
-    if (!(object instanceof BuiltinClassInstance)) {
+    if (!(object instanceof BuiltinClass)) {
       throw new RuntimeException(`Object <${object}> is not a class instance`);
     }
 
@@ -171,18 +170,9 @@ export default class Interpreter
     const propertyName = expression.token.lexeme as string;
 
     if (object instanceof BuiltinClass) {
-      const method = object.getStaticMethod(propertyName);
-
-      if (!method) {
-        throw new RuntimeException(
-          `Object <${object.toString()}> has no static method called <${propertyName}>`
-        );
-      }
-      return method;
-    }
-
-    if (object instanceof BuiltinClassInstance) {
-      const method = object.getProperty(propertyName);
+      const method = object.isClassInstance()
+        ? object.getProperty(propertyName)
+        : object.getStaticMethod(propertyName);
 
       if (!method) {
         throw new RuntimeException(
@@ -223,6 +213,14 @@ export default class Interpreter
 
   public visitClassStatement(statement: Stmt.Class): void {
     const className = statement.name.lexeme as string;
+    const superclass = statement.superclass
+      ? statement.superclass.accept(this)
+      : null;
+
+    if (superclass && !(superclass instanceof BuiltinClass)) {
+      throw new RuntimeException(`<${superclass}> is not a class`);
+    }
+
     this.environment.define(className, null);
 
     const classMethods = new Map<string, BuiltinFunction>();
@@ -243,6 +241,7 @@ export default class Interpreter
 
     const builtinClass = new BuiltinClass(
       className,
+      superclass,
       classMethods,
       staticMethods
     );

@@ -3,7 +3,7 @@ import * as Stmt from "../../../parser/statements";
 import Environment from "../../environment/Environment";
 import Interpreter from "../../Interpreter";
 import { Maybe } from "../../../lib/Std";
-import BuiltinClassInstance from "../class/BuiltinClassInstance";
+import BuiltinClass from "../class/BuiltinClass";
 
 export default class BuiltinFunction implements Callable {
   constructor(
@@ -11,7 +11,7 @@ export default class BuiltinFunction implements Callable {
     private readonly closure: Environment
   ) {}
 
-  public __bind(instance: BuiltinClassInstance): BuiltinFunction {
+  public __bind(instance: BuiltinClass): BuiltinFunction {
     const environment = new Environment()
       .setParentEnvironment(this.closure)
       .define("this", instance);

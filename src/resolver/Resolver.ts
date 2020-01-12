@@ -184,6 +184,16 @@ export default class Resolver
     this.define(statement.name);
     this.declare(statement.name);
 
+    if (statement.superclass) {
+      const className = statement.name.lexeme as string;
+      const superClassName = statement.superclass.name.lexeme as string;
+      if (className === superClassName) {
+        console.error(`Class <${className}> can't extend <${superClassName}>`);
+      }
+
+      statement.superclass.accept(this);
+    }
+
     this.beginScope();
     this.getCurrentScope().set("this", true);
 

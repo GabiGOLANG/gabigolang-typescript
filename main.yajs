@@ -1,19 +1,12 @@
-class User {
-  constructor(name, age){
-    this.name = name;
-    this.age = age;
-  }
-
-  static test() {
-    print "static works";
-  }
-
-  dump() {
-    print this.name + ", " + this.age;
+class Entity {
+  sayHello(name) {
+    print "entity says hello to " + name
   }
 }
 
-User.test();
+class User extends Entity {
+ 
+}
 
-const user = User("john", 20);
-user.dump();
+const user = User()
+user.sayHello("world!")

@@ -352,4 +352,19 @@ const user = User("john", 20);
 user.dump();
 
 user.test() // Error: Object <<User>> has no property called <test>
+
+...
+
+class Entity {
+  sayHello(name) {
+    print "entity says hello to " + name
+  }
+}
+
+class User extends Entity {
+
+}
+
+const user = User()
+user.sayHello("world!")
 ```

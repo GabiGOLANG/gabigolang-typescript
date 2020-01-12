@@ -1,14 +1,18 @@
 import Callable from "../callable/Callable";
 import Interpreter from "../../Interpreter";
-import BuiltinClassInstance from "./BuiltinClassInstance";
 import BuiltinFunction from "../callable/BuiltinFunction";
 import { Maybe } from "../../../lib/Std";
+import RuntimeException from "../../exceptions/Runtime";
 
 export default class BuiltinClass implements Callable {
+  private properties = new Map<string, any>();
+
   constructor(
     private readonly name: string,
+    private superclass: BuiltinClass,
     private methods: Map<string, BuiltinFunction>,
-    private staticMethods: Map<string, BuiltinFunction>
+    private staticMethods: Map<string, BuiltinFunction>,
+    private _isClassInstance: boolean = false
   ) {}
 
   public toString = (): string => this.name;
@@ -21,7 +25,13 @@ export default class BuiltinClass implements Callable {
   public __name = (): string => this.name;
 
   public __call(interpreter: Interpreter, args: any[]): any {
-    const instance = new BuiltinClassInstance(this);
+    const instance = new BuiltinClass(
+      this.name,
+      this.superclass,
+      this.methods,
+      this.staticMethods,
+      true
+    );
 
     const constructor = this.getMethod("constructor");
     if (constructor) {
@@ -30,9 +40,52 @@ export default class BuiltinClass implements Callable {
     return instance;
   }
 
-  public getMethod = (name: string): Maybe<BuiltinFunction> =>
-    this.methods.get(name);
+  public getMethod(name: string): Maybe<BuiltinFunction> {
+    if (this.methods.has(name)) {
+      return this.methods.get(name);
+    }
+    if (this.superclass) {
+      return this.superclass.getMethod(name);
+    }
+    return null;
+  }
 
-  public getStaticMethod = (name: string): Maybe<BuiltinFunction> =>
-    this.staticMethods.get(name);
+  public getStaticMethod(name: string): Maybe<BuiltinFunction> {
+    if (this.staticMethods.has(name)) {
+      return this.staticMethods.get(name);
+    }
+    if (this.superclass) {
+      return this.superclass.getStaticMethod(name);
+    }
+    return null;
+  }
+
+  public getProperty(name: string) {
+    if (this.properties.has(name)) {
+      return this.properties.get(name);
+    }
+
+    const method = this.getMethod(name);
+    if (method) {
+      return method.__bind(this);
+    }
+
+    if (this.superclass) {
+      const method = this.superclass.getMethod(name);
+      if (method) {
+        return method.__bind(this);
+      }
+    }
+
+    throw new RuntimeException(
+      `Object <${this.toString()}> has no property <${name}>`
+    );
+  }
+
+  public setProperty(name: string, value: any): this {
+    this.properties.set(name, value);
+    return this;
+  }
+
+  public isClassInstance = (): boolean => this._isClassInstance;
 }

@@ -9,10 +9,10 @@ export enum TokenType {
   MINUS,
   PLUS,
   MOD,
-  SEMICOLON,
   SLASH,
   STAR,
   NULL_COALESCING,
+  SEMI_COLON,
 
   // One or two character tokens.
   BANG,
@@ -34,6 +34,7 @@ export enum TokenType {
   STATIC,
   AND,
   CLASS,
+  CLASS_EXTENDS,
   ELSE,
   FALSE,
   FUNCTION,

@@ -20,6 +20,7 @@ const keywords = new Map<string, TokenType>([
   ["const", TokenType.CONST],
   ["while", TokenType.WHILE],
   ["class", TokenType.CLASS],
+  ["extends", TokenType.CLASS_EXTENDS],
   ["static", TokenType.STATIC]
 ]);
 
@@ -29,10 +30,10 @@ const tokens = new Map<string, TokenType>([
   ["{", TokenType.LEFT_BRACE],
   ["}", TokenType.RIGHT_BRACE],
   [",", TokenType.COMMA],
+  [";", TokenType.SEMI_COLON],
   [".", TokenType.DOT],
   ["-", TokenType.MINUS],
   ["+", TokenType.PLUS],
-  [";", TokenType.SEMICOLON],
   ["*", TokenType.STAR]
 ]);
 
@@ -78,7 +79,7 @@ export default class Lexer {
     }
 
     if (this.endOfSource()) {
-      return console.log(`${this.line} -> unterminated string`);
+      return console.error(`Unterminated string on line <${this.line}>`);
     }
 
     this.nextToken();
@@ -153,7 +154,9 @@ export default class Lexer {
         if (this.match("?")) {
           this.addToken(TokenType.NULL_COALESCING);
         } else {
-          console.log(`Unexpected character ${character} on line ${this.line}`);
+          console.error(
+            `Unexpected character <${character}> on line <${this.line}>`
+          );
         }
 
         break;
@@ -176,8 +179,8 @@ export default class Lexer {
           }
 
           if (this.endOfSource()) {
-            console.log(
-              `unclosed block comment starting at line ${blockCommentStart}`
+            console.error(
+              `Unterminated block comment starting at line <${blockCommentStart}>`
             );
           }
 
@@ -203,7 +206,9 @@ export default class Lexer {
         } else if (this.isAlpha(character)) {
           this.identifier();
         } else {
-          console.log(`Unexpected character ${character} on line ${this.line}`);
+          console.error(
+            `Unexpected character <${character}> on line <${this.line}>`
+          );
         }
         break;
     }
