@@ -11,3 +11,4 @@ export * from "./AccessObjectProperty";
 export * from "./AccessObjectProperty";
 export * from "./SetObjectProperty";
 export * from "./This";
+export * from "./Super";

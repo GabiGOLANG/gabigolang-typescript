@@ -9,7 +9,7 @@ export default class BuiltinClass implements Callable {
 
   constructor(
     private readonly name: string,
-    private superclass: BuiltinClass,
+    private superclass: Maybe<BuiltinClass>,
     private methods: Map<string, BuiltinFunction>,
     private staticMethods: Map<string, BuiltinFunction>,
     private _isClassInstance: boolean = false
@@ -27,7 +27,7 @@ export default class BuiltinClass implements Callable {
   public __call(interpreter: Interpreter, args: any[]): any {
     const instance = new BuiltinClass(
       this.name,
-      this.superclass,
+      this.superclass?.__call(interpreter, []),
       this.methods,
       this.staticMethods,
       true
@@ -35,8 +35,9 @@ export default class BuiltinClass implements Callable {
 
     const constructor = this.getMethod("constructor");
     if (constructor) {
-      constructor.__bind(instance).__call(interpreter, args);
+      constructor.__bind(instance, this.superclass).__call(interpreter, args);
     }
+
     return instance;
   }
 
@@ -67,13 +68,13 @@ export default class BuiltinClass implements Callable {
 
     const method = this.getMethod(name);
     if (method) {
-      return method.__bind(this);
+      return method.__bind(this, this.superclass);
     }
 
     if (this.superclass) {
       const method = this.superclass.getMethod(name);
       if (method) {
-        return method.__bind(this);
+        return method.__bind(this, this.superclass);
       }
     }
 
@@ -85,6 +86,31 @@ export default class BuiltinClass implements Callable {
   public setProperty(name: string, value: any): this {
     this.properties.set(name, value);
     return this;
+  }
+
+  public getSuperClassMethod(name: string): Maybe<BuiltinFunction> {
+    if (this.superclass) {
+      return this.superclass.getMethod(name);
+    }
+    return null;
+  }
+
+  public getSuperClassStaticMethod(name: string): Maybe<BuiltinFunction> {
+    if (this.superclass) {
+      return this.superclass.getStaticMethod(name);
+    }
+    return null;
+  }
+
+  public getSuperClassProperty(name: string) {
+    if (this.superclass) {
+      const method = this.superclass.getProperty(name);
+      if (method) {
+        return method.__bind(this, this.superclass);
+      }
+    }
+
+    return null;
   }
 
   public isClassInstance = (): boolean => this._isClassInstance;

@@ -1,11 +1,14 @@
 class Entity {
   sayHello(name) {
-    print "entity says hello to " + name
+    print "entity says hello to " + name ?? "world"
   }
 }
 
 class User extends Entity {
- 
+ sayHello(name){
+   print "user says hello to " + name
+   super.sayHello(null)
+ }
 }
 
 const user = User()

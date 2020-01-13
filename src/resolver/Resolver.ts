@@ -11,7 +11,8 @@ enum ScopeTypes {
   NONE,
   FUNCTION,
   METHOD,
-  CLASS_CONSTRUCTOR
+  CLASS_CONSTRUCTOR,
+  SUB_CLASS_METHOD
 }
 
 export default class Resolver
@@ -184,7 +185,14 @@ export default class Resolver
     this.define(statement.name);
     this.declare(statement.name);
 
+    this.beginScope();
+    const currentScope = this.getCurrentScope();
+    currentScope.set("this", true);
+
     if (statement.superclass) {
+      currentScope.set("super", true);
+      this.currentScopeType = ScopeTypes.SUB_CLASS_METHOD;
+
       const className = statement.name.lexeme as string;
       const superClassName = statement.superclass.name.lexeme as string;
       if (className === superClassName) {
@@ -194,11 +202,8 @@ export default class Resolver
       statement.superclass.accept(this);
     }
 
-    this.beginScope();
-    this.getCurrentScope().set("this", true);
-
     for (const method of statement.methods) {
-      this.resolveFunction(method, ScopeTypes.METHOD);
+      this.resolveFunction(method, this.currentScopeType);
     }
 
     this.endScope();
@@ -246,8 +251,21 @@ export default class Resolver
   }
 
   public visitThisExpression(expression: Expr.This): void {
-    if (this.currentScopeType !== ScopeTypes.METHOD) {
+    if (
+      this.currentScopeType !== ScopeTypes.METHOD &&
+      this.currentScopeType !== ScopeTypes.SUB_CLASS_METHOD
+    ) {
       console.error("Invalid use of <this> outside of class instance");
+      return;
+    }
+    this.resolveLocal(expression, expression.name);
+  }
+
+  public visitSuperExpression(expression: Expr.Super): void {
+    if (this.currentScopeType !== ScopeTypes.SUB_CLASS_METHOD) {
+      console.error(
+        "Invalid use of <super> outside of class sub class instance"
+      );
       return;
     }
     this.resolveLocal(expression, expression.name);

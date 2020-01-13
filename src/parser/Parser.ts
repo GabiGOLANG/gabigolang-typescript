@@ -98,6 +98,9 @@ export default class Parser {
     if (this.match(TokenType.THIS)) {
       return new Expr.This(this.previous());
     }
+    if (this.match(TokenType.SUPER)) {
+      return new Expr.Super(this.previous());
+    }
     if (this.match(TokenType.IDENTIFIER)) {
       return new Expr.Variable(this.previous());
     }
@@ -151,7 +154,14 @@ export default class Parser {
           "Expect property name after object access operator"
         );
 
-        expr = new Expr.AccessObjectProperty(expr, propertyName);
+        const isSuperClassProperty =
+          this.tokens[this.current - 3].type === TokenType.SUPER;
+
+        expr = new Expr.AccessObjectProperty(
+          expr,
+          propertyName,
+          isSuperClassProperty
+        );
       } else {
         break;
       }
@@ -276,6 +286,7 @@ export default class Parser {
   private ifStatement(): Stmt.Statement {
     this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'");
     const condition = this.expression();
+
     this.consume(TokenType.RIGHT_PAREN, "Expect ')' after if");
 
     const thenBranch = this.statement();

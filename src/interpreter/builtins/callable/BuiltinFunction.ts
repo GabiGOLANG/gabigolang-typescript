@@ -11,10 +11,14 @@ export default class BuiltinFunction implements Callable {
     private readonly closure: Environment
   ) {}
 
-  public __bind(instance: BuiltinClass): BuiltinFunction {
+  public __bind(
+    instance: BuiltinClass,
+    superClass: Maybe<BuiltinClass>
+  ): BuiltinFunction {
     const environment = new Environment()
       .setParentEnvironment(this.closure)
-      .define("this", instance);
+      .define("this", instance)
+      .define("super", superClass);
     return new BuiltinFunction(this.declaration, environment);
   }
 

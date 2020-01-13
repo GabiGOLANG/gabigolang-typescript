@@ -11,7 +11,6 @@ import BuiltinFunction from "./builtins/callable/BuiltinFunction";
 import ReturnException from "./exceptions/Return";
 import { Expression } from "../parser/expressions";
 import BuiltinClass from "./builtins/class/BuiltinClass";
-import InvalidPropertyAccessException from "./exceptions/InvalidPropertyAccess";
 import RuntimeException from "./exceptions/Runtime";
 
 export default class Interpreter
@@ -142,6 +141,9 @@ export default class Interpreter
   public visitThisExpression = (expression: Expr.This) =>
     this.lookUpVariable(expression);
 
+  public visitSuperExpression = (expression: Expr.Super) =>
+    this.lookUpVariable(expression);
+
   public visitCallExpression(expression: Expr.Call) {
     const callee = expression.callee.accept(this);
 
@@ -170,19 +172,28 @@ export default class Interpreter
     const propertyName = expression.token.lexeme as string;
 
     if (object instanceof BuiltinClass) {
+      if (expression.isSuperClassProperty) {
+        const method = object.isClassInstance()
+          ? object.getSuperClassProperty(propertyName)
+          : object.getSuperClassStaticMethod(propertyName);
+
+        if (method) {
+          return method;
+        }
+      }
+
       const method = object.isClassInstance()
         ? object.getProperty(propertyName)
         : object.getStaticMethod(propertyName);
 
-      if (!method) {
-        throw new RuntimeException(
-          `Object <${object.toString()}> has no property called <${propertyName}>`
-        );
+      if (method) {
+        return method;
       }
-      return method;
     }
 
-    throw new InvalidPropertyAccessException(propertyName);
+    throw new RuntimeException(
+      `Object <${object.toString()}> has no property called <${propertyName}>`
+    );
   }
 
   public visitExpressionStatement = (statement: Stmt.Expression) =>
@@ -255,6 +266,8 @@ export default class Interpreter
       this.environment = environment;
 
       block.forEach(stmt => stmt.accept(this));
+    } catch (exception) {
+      console.error(exception);
     } finally {
       this.environment = previousEnvironment;
     }

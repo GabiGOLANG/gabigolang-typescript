@@ -12,4 +12,5 @@ export default interface ExpressionVisitor<T> {
   visitAccessObjectPropertyExpression(expression: Expr.AccessObjectProperty): T;
   visitSetObjectPropertyExpression(expression: Expr.SetObjectProperty): T;
   visitThisExpression(expression: Expr.This): T;
+  visitSuperExpression(expression: Expr.Super): T;
 }

@@ -15,6 +15,7 @@ const keywords = new Map<string, TokenType>([
   ["return", TokenType.RETURN],
   ["super", TokenType.SUPER],
   ["this", TokenType.THIS],
+  ["super", TokenType.SUPER],
   ["true", TokenType.TRUE],
   ["let", TokenType.LET],
   ["const", TokenType.CONST],

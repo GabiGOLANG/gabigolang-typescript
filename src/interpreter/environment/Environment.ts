@@ -53,11 +53,9 @@ export default class Environment {
     if (this.values.has(variableName)) {
       return this.values.get(variableName);
     }
-
     if (this.constValues.has(variableName)) {
       return this.constValues.get(variableName);
     }
-
     if (this.parentEnvironment) {
       return this.parentEnvironment.get(name);
     }
