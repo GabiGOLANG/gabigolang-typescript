@@ -18,7 +18,7 @@ dumpUser(user)
 ```sh
 clone this repo
 run `yarn`
-modGOLy main.gabigolang
+modify main.gabigolang
 yarn `yarn start`
 ```
 
