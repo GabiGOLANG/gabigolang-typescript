@@ -49,7 +49,7 @@ PLAQUINHA "hello world!"
 ```js
 "hello world" // string
 1 // number
-RODNEY // null
+VASCO // null
 VAR // true
 JUIZ // false
 ```
@@ -77,7 +77,7 @@ MARACANA myVariable // error, const variable must be initialized
 > Null and Null coalescing
 
 ```js
-MARACANA a = RODNEY ?? "hello world" // hello world
+MARACANA a = VASCO ?? "hello world" // hello world
 
 ...
 
@@ -85,7 +85,7 @@ POZE getValue() {
   GLOBO "value"
 }
 
-MARACANA a = RODNEY ?? getValue() // value
+MARACANA a = VASCO ?? getValue() // value
 
 ...
 
@@ -98,7 +98,7 @@ MARACANA b = getValue() ?? "other value" // 10
 ...
 
 POZE getValue() {
-  GLOBO RODNEY
+  GLOBO VASCO
 }
 
 MARACANA c = getValue() ?? "other value" // other value
@@ -130,7 +130,7 @@ PLAQUINHA !!10             // VAR
 PLAQUINHA !!0              // JUIZ
 PLAQUINHA !!"hello world!" // VAR
 PLAQUINHA !!""             // JUIZ
-PLAQUINHA !!RODNEY           // JUIZ
+PLAQUINHA !!VASCO           // JUIZ
 ```
 
 > Scope

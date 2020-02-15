@@ -9,7 +9,7 @@ const keywords = new Map<string, TokenType>([
   ["BRASILEIRAO", TokenType.FOR],
   ["POZE", TokenType.FUNCTION],
   ["GOL", TokenType.IF],
-  ["RODNEY", TokenType.NULL],
+  ["VASCO", TokenType.NULL],
   ["PLAQUINHA", TokenType.PRINT],
   ["GLOBO", TokenType.RETURN],
   ["JESUS", TokenType.SUPER],
