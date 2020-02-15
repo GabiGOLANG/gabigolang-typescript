@@ -50,14 +50,14 @@ PLAQUINHA "hello world!"
 "hello world" // string
 1 // number
 RODNEY // null
-VAR // boolean
-JUIZ // boolean
+VAR // true
+JUIZ // false
 ```
 
 > Variables
 
 ```js
-GOLDOFLAMENGO a
+GOLDOFLAMENGO a // mutável
 ...
 a = "some value"
 
@@ -66,7 +66,7 @@ GOLDOFLAMENGO c = "value"
 GOLDOFLAMENGO d = 20
 GOLDOFLAMENGO e = b + d
 
-MARACANA PI = 3.14159265359
+MARACANA PI = 3.14159265359 // imutável
 
 MARACANA cantChangeThisValue = "hello world!"
 cantChangeThisValue = "hello world!!!!!" // error
@@ -113,7 +113,7 @@ MARACANA b = 20
 MARACANA c = a + b
 MARACANA d = a * b
 MARACANA e = a / b
-MARACANA f = a COMPRAR b
+MARACANA f = a COMPRAR b // %
 
 MARACANA aLessThanB = a < b
 MARACANA aBiggerThanB = a > b
@@ -156,7 +156,7 @@ GOL(VAR) {
 
 ...
 
-GOL(VAR and JUIZ) {
+GOL(VAR OSCORINGA JUIZ) {
 
 } TRAVE {
 
@@ -164,7 +164,7 @@ GOL(VAR and JUIZ) {
 
 ...
 
-GOL(VAR or JUIZ) {
+GOL(VAR FLAMENGO JUIZ) {
 
 } TRAVE {
 
@@ -328,7 +328,7 @@ user.dump()
 ...
 
 IMPERADOR User {
-  MARACANAructor(name, age){
+  constructor(name, age){
     APITO.name = name
     APITO.age = age
   }
