@@ -1,15 +1,11 @@
-### Toy language
-
-#### Based on this book https://craftinginterpreters.com/
-
 ```js
-function dumpUser(user) {
-  print user.name + " " + user.surname + ", " + user.age
+POZE dumpUser(user) {
+  PLAQUINHA user.name + " " + user.surname + ", " + user.age
 }
 
-class User {}
+IMPERADOR User {}
 
-const user = User()
+MARACANA user = User()
 user.name = "john"
 user.surname = "doe"
 user.age = 20
@@ -22,7 +18,7 @@ dumpUser(user)
 ```sh
 clone this repo
 run `yarn`
-modify main.yajs
+modGOLy main.gabigolang
 yarn `yarn start`
 ```
 
@@ -31,7 +27,7 @@ yarn `yarn start`
 > Output
 
 ```js
-print "hello world!"
+PLAQUINHA "hello world!"
 ```
 
 > Comments
@@ -51,146 +47,146 @@ print "hello world!"
 > Values
 
 ```js
-"hello world"; // string
-1; // number
-null; // null
-true; // boolean
-false; // boolean
+"hello world" // string
+1 // number
+RODNEY // null
+VAR // boolean
+JUIZ // boolean
 ```
 
 > Variables
 
 ```js
-let a
+GOLDOFLAMENGO a
 ...
 a = "some value"
 
-let b = 10
-let c = "value"
-let d = 20
-let e = b + d
+GOLDOFLAMENGO b = 10
+GOLDOFLAMENGO c = "value"
+GOLDOFLAMENGO d = 20
+GOLDOFLAMENGO e = b + d
 
-const PI = 3.14159265359
+MARACANA PI = 3.14159265359
 
-const cantChangeThisValue = "hello world!"
+MARACANA cantChangeThisValue = "hello world!"
 cantChangeThisValue = "hello world!!!!!" // error
 
-const myVariable // error, const variable must be initialized
+MARACANA myVariable // error, const variable must be initialized
 ```
 
 > Null and Null coalescing
 
 ```js
-const a = null ?? "hello world" // hello world
+MARACANA a = RODNEY ?? "hello world" // hello world
 
 ...
 
-function getValue() {
-  return "value"
+POZE getValue() {
+  GLOBO "value"
 }
 
-const a = null ?? getValue() // value
+MARACANA a = RODNEY ?? getValue() // value
 
 ...
 
-function getValue() {
-  return 10
+POZE getValue() {
+  GLOBO 10
 }
 
-const b = getValue() ?? "other value" // 10
+MARACANA b = getValue() ?? "other value" // 10
 
 ...
 
-function getValue() {
-  return null
+POZE getValue() {
+  GLOBO RODNEY
 }
 
-const c = getValue() ?? "other value" // other value
+MARACANA c = getValue() ?? "other value" // other value
 ```
 
 > Operators
 
 ```js
-const a = 10
-const b = 20
+MARACANA a = 10
+MARACANA b = 20
 
-const c = a + b
-const d = a * b
-const e = a / b
-const f = a mod b
+MARACANA c = a + b
+MARACANA d = a * b
+MARACANA e = a / b
+MARACANA f = a COMPRAR b
 
-const aLessThanB = a < b
-const aBiggerThanB = a > b
+MARACANA aLessThanB = a < b
+MARACANA aBiggerThanB = a > b
 
-const aEqualsB = a == b
-const aDifferentThanB = a != b
+MARACANA aEqualsB = a == b
+MARACANA aDGOLferentThanB = a != b
 
-const f = !true
+MARACANA f = !VAR
 
-const f1 = true and false
-const t = true or false
+MARACANA f1 = VAR OSCORINGA JUIZ
+MARACANA t = VAR FLAMENGO JUIZ
 
-print !!10             // true
-print !!0              // false
-print !!"hello world!" // true
-print !!""             // false
-print !!null           // false
+PLAQUINHA !!10             // VAR
+PLAQUINHA !!0              // JUIZ
+PLAQUINHA !!"hello world!" // VAR
+PLAQUINHA !!""             // JUIZ
+PLAQUINHA !!RODNEY           // JUIZ
 ```
 
 > Scope
 
 ```js
-const i = 10
-print i // 10
+MARACANA i = 10
+PLAQUINHA i // 10
 
 {
-  const i = 20
-  print i // 20
+  MARACANA i = 20
+  PLAQUINHA i // 20
 }
 
-print i // 10
+PLAQUINHA i // 10
 ```
 
 > Control flow
 
 ```js
-if(true) {
+GOL(VAR) {
 
 }
 
 ...
 
-if(true and false) {
+GOL(VAR and JUIZ) {
 
-} else {
-
-}
-
-...
-
-if(true or false) {
-
-} else {
-
-}
-
-if(!false) {
+} TRAVE {
 
 }
 
 ...
 
-let a = 10
-if(a < 20) {
+GOL(VAR or JUIZ) {
+
+} TRAVE {
+
+}
+
+GOL(!JUIZ) {
 
 }
 
 ...
 
-let x = "hello"
-if(x == "hello world!"){
+GOLDOFLAMENGO a = 10
+GOL(a < 20) {
 
-} else {
+}
+
+...
+
+GOLDOFLAMENGO x = "hello"
+GOL(x == "hello world!"){
+
+} TRAVE {
 
 }
 ```
@@ -198,20 +194,20 @@ if(x == "hello world!"){
 > For loop
 
 ```js
-for(let i = 0; i < 10; i = i + 1) {
+BRASILEIRAO(GOLDOFLAMENGO i = 0; i < 10; i = i + 1) {
 
 }
 
 ...
 
-let j = 0;
-for( ; j < 5; j = j + 1) {
+GOLDOFLAMENGO j = 0;
+BRASILEIRAO( ; j < 5; j = j + 1) {
 
 }
 
 ...
 
-for( ; ; ) {
+BRASILEIRAO( ; ; ) {
 
 }
 ```
@@ -219,14 +215,14 @@ for( ; ; ) {
 > While loop
 
 ```js
-while(true) {
+LIBERTA(VAR) {
   ...
 }
 
 ...
 
-let i = 0
-while(i < 10) {
+GOLDOFLAMENGO i = 0
+LIBERTA(i < 10) {
   i = i + 1
 }
 ```
@@ -234,81 +230,81 @@ while(i < 10) {
 > Functions
 
 ```js
-function sayHello(name){
-  print "Hello " + name
+POZE sayHello(name){
+  PLAQUINHA "Hello " + name
 }
 
-let name = "world"
+GOLDOFLAMENGO name = "world"
 sayHello(name)
 
 ...
 
-function fibonacci(n) {
-  if(n < 2) {
-    return n
+POZE fibonacci(n) {
+  GOL(n < 2) {
+    GLOBO n
   }
-  return fibonacci(n - 1) + fibonacci(n - 2)
+  GLOBO fibonacci(n - 1) + fibonacci(n - 2)
 }
 
-print fibonacci(5)
+PLAQUINHA fibonacci(5)
 
 ...
 
-function factorial(n) {
-  if(n < 2) {
-    return n
+POZE factorial(n) {
+  GOL(n < 2) {
+    GLOBO n
   }
-  return n * factorial(n - 1)
+  GLOBO n * factorial(n - 1)
 }
 
-print factorial(5)
+PLAQUINHA factorial(5)
 ```
 
 > Closures
 
 ```js
-function makeCounter() {
-  let i = 0
+POZE makeCounter() {
+  GOLDOFLAMENGO i = 0
 
-  function count() {
+  POZE count() {
     i = i + 1
-    return i
+    GLOBO i
   }
 
-  return count
+  GLOBO count
 }
 
-const count = makeCounter()
-print count()
-print count()
+MARACANA count = makeCounter()
+PLAQUINHA count()
+PLAQUINHA count()
 ```
 
 > Classes
 
 ```js
-class Foo {}
-const fooInstance = Foo()
+IMPERADOR Foo {}
+MARACANA fooInstance = Foo()
 
 ...
 
-class Foo {
+IMPERADOR Foo {
   sayHello(name) {
-    print "hello " + name
+    PLAQUINHA "hello " + name
   }
 }
 
-const fooInstance = Foo()
+MARACANA fooInstance = Foo()
 fooInstance.sayHello("world!")
 
 ...
 
-function dumpUser(user) {
-  print user.name + " " + user.surname + ", " + user.age
+POZE dumpUser(user) {
+  PLAQUINHA user.name + " " + user.surname + ", " + user.age
 }
 
-class User {}
+IMPERADOR User {}
 
-const user = User()
+MARACANA user = User()
 user.name = "john"
 user.surname = "doe"
 user.age = 20
@@ -317,13 +313,13 @@ dumpUser(user)
 
 ...
 
-class User {
+IMPERADOR User {
   dump() {
-    print this.name + ", " + this.age
+    PLAQUINHA APITO.name + ", " + APITO.age
   }
 }
 
-const user = User()
+MARACANA user = User()
 user.name = "john"
 user.age = 20
 
@@ -331,58 +327,58 @@ user.dump()
 
 ...
 
-class User {
-  constructor(name, age){
-    this.name = name
-    this.age = age
+IMPERADOR User {
+  MARACANAructor(name, age){
+    APITO.name = name
+    APITO.age = age
   }
 
-  static test() {
-    print "static works"
+  TROPADOJJ test() {
+    PLAQUINHA "static works"
   }
 
   dump() {
-    print this.name + ", " + this.age
+    PLAQUINHA APITO.name + ", " + APITO.age
   }
 }
 
 User.test()
 
-const user = User("john", 20)
+MARACANA user = User("john", 20)
 user.dump()
 
 user.test() // Error: Object <<User>> has no property called <test>
 
 ...
 
-class Entity {
+IMPERADOR Entity {
   sayHello(name) {
-    print "entity says hello to " + name
+    PLAQUINHA "entity says hello to " + name
   }
 }
 
-class User extends Entity {
+IMPERADOR User SERIEB Entity {
 
 }
 
-const user = User()
+MARACANA user = User()
 user.sayHello("world!")
 
 ...
 
-class Entity {
+IMPERADOR Entity {
   sayHello(name) {
-    print "entity says hello to " + name
+    PLAQUINHA "entity says hello to " + name
   }
 }
 
-class User extends Entity {
+IMPERADOR User SERIEB Entity {
  sayHello(name){
-   print "user says hello to " + name
-   super.sayHello(name)
+   PLAQUINHA "user says hello to " + name
+   JESUS.sayHello(name)
  }
 }
 
-const user = User()
+MARACANA user = User()
 user.sayHello("world!")
 ```
