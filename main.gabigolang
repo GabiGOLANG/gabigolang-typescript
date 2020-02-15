@@ -1,11 +1,5 @@
-IMPERADOR Foo {
-  TROPADOJJ test(time){
-    GOL(time == "framengo") {
-      PLAQUINHA "gabigol"
-    } TRAVE {
-      PLAQUINHA "sem mundial"
-    }
-  }
-}
+GOLDOFLAMENGO i = 0
 
-Foo.test("palmeiras")
+i = 10
+
+PLAQUINHA i

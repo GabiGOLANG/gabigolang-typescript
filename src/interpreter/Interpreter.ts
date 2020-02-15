@@ -105,8 +105,9 @@ export default class Interpreter
     if (scopeDistance) {
       this.environment.assignAtScope(scopeDistance, expression.name, value)
     } else {
-      this.globals.assign(expression.name, value)
+      this.environment.assign(expression.name, value)
     }
+
     return value
   }
 
